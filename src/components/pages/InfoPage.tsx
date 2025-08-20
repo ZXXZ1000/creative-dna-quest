@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { PageContainer } from '../PageContainer';
 
 interface InfoPageProps {
-  onContinue: (name: string, region: string, emailSubscription: boolean) => void;
+  onContinue: (name: string, email: string, region: string, emailSubscription: boolean) => void;
   initialData?: {
     name: string;
+    email: string;
     region: string;
     emailSubscription: boolean;
   };
@@ -12,17 +13,23 @@ interface InfoPageProps {
 
 export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) => {
   const [name, setName] = useState(initialData?.name || '');
+  const [email, setEmail] = useState(initialData?.email || '');
   const [region, setRegion] = useState(initialData?.region || '');
   const [emailSubscription, setEmailSubscription] = useState(initialData?.emailSubscription ?? true);
-  const [errors, setErrors] = useState<{ name?: string; region?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; email?: string; region?: string }>({});
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
 
   const validate = () => {
-    const newErrors: { name?: string; region?: string } = {};
+    const newErrors: { name?: string; email?: string; region?: string } = {};
     
     if (!name.trim()) {
       newErrors.name = 'Name is required';
     } else if (name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters';
+    }
+
+    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      newErrors.email = 'Please enter a valid email address';
     }
     
     if (!region) {
@@ -34,9 +41,19 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
   };
 
   const handleSubmit = () => {
-    if (validate()) {
-      onContinue(name.trim(), region, emailSubscription);
+    if (!validate()) return;
+    
+    if (!email.trim()) {
+      setShowEmailPrompt(true);
+      return;
     }
+    
+    onContinue(name.trim(), email.trim(), region, emailSubscription);
+  };
+
+  const handleSkipEmail = () => {
+    onContinue(name.trim(), '', region, emailSubscription);
+    setShowEmailPrompt(false);
   };
 
   const regions = [
@@ -79,6 +96,28 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             {errors.name && (
               <p className="text-destructive text-sm mt-1">{errors.name}</p>
             )}
+          </div>
+
+          {/* Email Input */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Email Address (Optional)</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-input transition-all
+                ${errors.email 
+                  ? 'border-destructive focus:border-destructive' 
+                  : 'border-input-border focus:border-input-focus'
+                } focus:outline-none`}
+            />
+            {errors.email && (
+              <p className="text-destructive text-sm mt-1">{errors.email}</p>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              We'll send you your results and creative tips
+            </p>
           </div>
 
           {/* Region Select */}
@@ -132,6 +171,35 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             GET MY RESULTS
           </button>
         </div>
+
+        {/* Email Prompt Modal */}
+        {showEmailPrompt && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-card p-6 rounded-2xl max-w-sm w-full border border-input-border animate-scale-in">
+              <div className="text-center space-y-4">
+                <div className="text-4xl">🎁</div>
+                <h3 className="text-lg font-semibold">Don't miss out!</h3>
+                <p className="text-sm text-muted-foreground">
+                  Add your email to receive your personalized Creative DNA results and future creative inspiration!
+                </p>
+                <div className="space-y-3 pt-2">
+                  <button 
+                    onClick={() => setShowEmailPrompt(false)}
+                    className="btn-primary w-full text-sm py-2"
+                  >
+                    I'll add my email
+                  </button>
+                  <button 
+                    onClick={handleSkipEmail}
+                    className="btn-secondary w-full text-sm py-2"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PageContainer>
   );

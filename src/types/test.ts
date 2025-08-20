@@ -27,6 +27,7 @@ export interface TestState {
   scores: { [key in CreativeType]: number };
   userInfo: {
     name: string;
+    email: string;
     region: string;
     emailSubscription: boolean;
   };

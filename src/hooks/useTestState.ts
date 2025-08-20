@@ -15,6 +15,7 @@ const initialState: TestState = {
   },
   userInfo: {
     name: '',
+    email: '',
     region: '',
     emailSubscription: true
   }

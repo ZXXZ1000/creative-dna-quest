@@ -6,6 +6,7 @@ import { SciencePage } from './pages/SciencePage';
 import { QuestionPage } from './pages/QuestionPage';
 import { InfoPage } from './pages/InfoPage';
 import { ResultPage } from './pages/ResultPage';
+import { PageTransition } from './PageTransition';
 
 export const CreativeDNATest: React.FC = () => {
   const {
@@ -44,8 +45,8 @@ export const CreativeDNATest: React.FC = () => {
     }
   };
 
-  const handleInfoSubmit = (name: string, region: string, emailSubscription: boolean) => {
-    updateUserInfo({ name, region, emailSubscription });
+  const handleInfoSubmit = (name: string, email: string, region: string, emailSubscription: boolean) => {
+    updateUserInfo({ name, email, region, emailSubscription });
     calculateResult();
     setCurrentPage(12); // Go to result page
   };
@@ -151,7 +152,9 @@ export const CreativeDNATest: React.FC = () => {
 
   return (
     <div className="min-h-screen overflow-hidden">
-      {renderCurrentPage()}
+      <PageTransition pageKey={`page-${state.currentPage}`}>
+        {renderCurrentPage()}
+      </PageTransition>
     </div>
   );
 };

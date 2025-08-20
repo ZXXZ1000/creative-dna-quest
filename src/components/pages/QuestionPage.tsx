@@ -21,22 +21,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   onNext
 }) => {
   const [selected, setSelected] = useState<number | null>(selectedOption || null);
-  const [autoAdvance, setAutoAdvance] = useState(false);
 
   const handleOptionSelect = (optionId: number, scores: any) => {
     setSelected(optionId);
     onSelectOption(optionId, scores);
-    setAutoAdvance(true);
   };
-
-  useEffect(() => {
-    if (autoAdvance && selected) {
-      const timer = setTimeout(() => {
-        onNext();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [autoAdvance, selected, onNext]);
 
   return (
     <PageContainer className="justify-start pt-16">
@@ -65,7 +54,6 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
                   selected === option.id ? 'selected' : ''
                 }`}
                 style={{ animationDelay: `${0.3 + index * 0.1}s` }}
-                disabled={autoAdvance}
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-4 h-4 rounded-full border-2 transition-all ${
@@ -84,13 +72,12 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           </div>
         </div>
 
-        {/* Auto-advance indicator */}
-        {autoAdvance && (
-          <div className="text-center animate-fade-in">
-            <div className="inline-flex items-center space-x-2 text-sm text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-primary rounded-full animate-spin border-t-transparent"></div>
-              <span>Moving to next question...</span>
-            </div>
+        {/* Next Button */}
+        {selected && (
+          <div className="pt-4 animate-fade-in">
+            <button onClick={onNext} className="btn-primary w-full">
+              {questionNumber === totalQuestions ? 'FINISH' : 'NEXT QUESTION'}
+            </button>
           </div>
         )}
       </div>
