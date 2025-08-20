@@ -24,7 +24,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
       className={`page-container glow-bg ${className}`}
       {...(onSwipeUp ? touchHandlers : {})}
       style={{
-        transform: isDragging ? `translateY(-${swipeProgress * 50}px)` : 'translateY(0)',
+        transform: isDragging ? `translateY(${swipeProgress * 50}px)` : 'translateY(0)',
         transition: isDragging ? 'none' : 'transform 0.3s ease-out'
       }}
     >

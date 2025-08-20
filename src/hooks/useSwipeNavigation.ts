@@ -26,15 +26,15 @@ export const useSwipeNavigation = (onSwipeUp: () => void, threshold: number = 10
     if (!swipeState.isDragging) return;
     
     const touch = e.touches[0];
-    const deltaY = touchStartRef.current - touch.clientY;
+    const deltaY = touch.clientY - touchStartRef.current;
     
     setSwipeState(prev => ({
       ...prev,
       currentY: touch.clientY
     }));
 
-    // Prevent default scroll behavior during swipe
-    if (deltaY > 0) {
+    // Prevent default scroll behavior during upward swipe
+    if (deltaY < 0) {
       e.preventDefault();
     }
   }, [swipeState.isDragging]);
@@ -42,9 +42,9 @@ export const useSwipeNavigation = (onSwipeUp: () => void, threshold: number = 10
   const handleTouchEnd = useCallback(() => {
     if (!swipeState.isDragging) return;
 
-    const deltaY = touchStartRef.current - swipeState.currentY;
+    const deltaY = swipeState.currentY - touchStartRef.current;
     
-    if (deltaY > threshold) {
+    if (deltaY < -threshold) {
       onSwipeUp();
     }
 

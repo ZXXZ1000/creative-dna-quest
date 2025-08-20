@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageContainer } from '../PageContainer';
+import { SimplePageContainer } from '../SimplePageContainer';
 
 interface InfoPageProps {
   onContinue: (name: string, email: string, region: string, emailSubscription: boolean) => void;
@@ -62,7 +62,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
   ];
 
   return (
-    <PageContainer>
+    <SimplePageContainer>
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center space-y-2 animate-scale-in">
@@ -201,6 +201,6 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
           </div>
         )}
       </div>
-    </PageContainer>
+    </SimplePageContainer>
   );
 };

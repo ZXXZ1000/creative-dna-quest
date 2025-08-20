@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageContainer } from '../PageContainer';
+import { SimplePageContainer } from '../SimplePageContainer';
 
 interface SciencePageProps {
   onContinue: () => void;
@@ -8,7 +8,7 @@ interface SciencePageProps {
 
 export const SciencePage: React.FC<SciencePageProps> = ({ onContinue, onSkip }) => {
   return (
-    <PageContainer onSwipeUp={onContinue}>
+    <SimplePageContainer>
       <div className="space-y-6">
         {/* Header */}
         <div className="animate-scale-in">
@@ -55,6 +55,6 @@ export const SciencePage: React.FC<SciencePageProps> = ({ onContinue, onSkip }) 
           </button>
         </div>
       </div>
-    </PageContainer>
+    </SimplePageContainer>
   );
 };

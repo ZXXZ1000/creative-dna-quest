@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTestState } from '../hooks/useTestState';
 import { questions } from '../data/questions';
 import { LandingPage } from './pages/LandingPage';
@@ -6,12 +6,13 @@ import { SciencePage } from './pages/SciencePage';
 import { QuestionPage } from './pages/QuestionPage';
 import { InfoPage } from './pages/InfoPage';
 import { ResultPage } from './pages/ResultPage';
-import { PageTransition } from './PageTransition';
+import { SwipePageContainer } from './SwipePageContainer';
 
 export const CreativeDNATest: React.FC = () => {
   const {
     state,
     nextPage,
+    previousPage,
     setCurrentPage,
     selectAnswer,
     updateUserInfo,
@@ -73,88 +74,102 @@ export const CreativeDNATest: React.FC = () => {
     restartTest();
   };
 
-  // Prevent default touch behaviors to improve swipe experience
+  // 生成所有页面组件
+  const allPages = useMemo(() => {
+    const pages = [];
+    
+    // 页面1: 首页
+    pages.push(
+      <LandingPage key="landing" onStart={handleStartTest} />
+    );
+    
+    // 页面2: 科学页面
+    pages.push(
+      <SciencePage 
+        key="science"
+        onContinue={handleContinueFromScience} 
+        onSkip={handleSkipScience} 
+      />
+    );
+    
+    // 页面3-10: 问题页面
+    questions.forEach((question, index) => {
+      const pageNumber = index + 3;
+      pages.push(
+        <QuestionPage
+          key={`question-${question.id}`}
+          question={question}
+          questionNumber={index + 1}
+          totalQuestions={questions.length}
+          selectedOption={state.answers[question.id]}
+          onSelectOption={(optionId, scores) => 
+            handleQuestionAnswer(question.id, optionId, scores)
+          }
+          onNext={handleNextQuestion}
+        />
+      );
+    });
+    
+    // 页面11: 信息页面
+    pages.push(
+      <InfoPage
+        key="info"
+        onContinue={handleInfoSubmit}
+        initialData={state.userInfo}
+      />
+    );
+    
+    // 页面12: 结果页面
+    pages.push(
+      state.result ? (
+        <ResultPage
+          key="result"
+          result={state.result}
+          userName={state.userInfo.name}
+          onRestart={handleRestart}
+          onShare={handleShare}
+        />
+      ) : <div key="result" className="flex items-center justify-center h-full">Loading...</div>
+    );
+    
+    return pages;
+  }, [state.answers, state.userInfo, state.result]);
+
+  // 页面切换处理
+  const handlePageChange = (newIndex: number) => {
+    const newPageNumber = newIndex + 1;
+    if (newPageNumber >= 1 && newPageNumber <= 12) {
+      setCurrentPage(newPageNumber);
+    }
+  };
+
+  // 防止默认触摸行为以改善滑动体验
   useEffect(() => {
     const preventDefault = (e: TouchEvent) => {
+      // 防止多点触控
       if (e.touches.length > 1) {
         e.preventDefault();
       }
     };
 
     document.addEventListener('touchstart', preventDefault, { passive: false });
-    document.addEventListener('touchmove', preventDefault, { passive: false });
-
+    
     return () => {
       document.removeEventListener('touchstart', preventDefault);
-      document.removeEventListener('touchmove', preventDefault);
     };
   }, []);
 
-  // Render current page
-  const renderCurrentPage = () => {
-    switch (state.currentPage) {
-      case 1:
-        return <LandingPage onStart={handleStartTest} />;
-      
-      case 2:
-        return (
-          <SciencePage 
-            onContinue={handleContinueFromScience} 
-            onSkip={handleSkipScience} 
-          />
-        );
-      
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-      case 9:
-      case 10:
-        const questionIndex = state.currentPage - 3;
-        const currentQuestion = questions[questionIndex];
-        return (
-          <QuestionPage
-            question={currentQuestion}
-            questionNumber={questionIndex + 1}
-            totalQuestions={questions.length}
-            selectedOption={state.answers[currentQuestion.id]}
-            onSelectOption={(optionId, scores) => 
-              handleQuestionAnswer(currentQuestion.id, optionId, scores)
-            }
-            onNext={handleNextQuestion}
-          />
-        );
-      
-      case 11:
-        return (
-          <InfoPage
-            onContinue={handleInfoSubmit}
-            initialData={state.userInfo}
-          />
-        );
-      
-      case 12:
-        return state.result ? (
-          <ResultPage
-            result={state.result}
-            userName={state.userInfo.name}
-            onRestart={handleRestart}
-            onShare={handleShare}
-          />
-        ) : null;
-      
-      default:
-        return <LandingPage onStart={handleStartTest} />;
-    }
-  };
+  const currentIndex = state.currentPage - 1; // 转换为0基础索引
 
   return (
     <div className="min-h-screen overflow-hidden">
-      <PageTransition pageKey={`page-${state.currentPage}`}>
-        {renderCurrentPage()}
-      </PageTransition>
+      <SwipePageContainer
+        currentIndex={currentIndex}
+        onPageChange={handlePageChange}
+        enableSwipe={true}
+      >
+        {allPages}
+      </SwipePageContainer>
     </div>
   );
 };

@@ -38,8 +38,8 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
         isVisible 
           ? 'translate-y-0 opacity-100' 
           : direction === 'up' 
-            ? 'translate-y-full opacity-0' 
-            : '-translate-y-full opacity-0'
+            ? '-translate-y-full opacity-0' 
+            : 'translate-y-full opacity-0'
       }`}
     >
       {currentContent}
