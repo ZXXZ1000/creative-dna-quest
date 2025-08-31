@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SimplePageContainer } from '../SimplePageContainer';
 import { CreativeProfile } from '../../types/test';
 
 interface ResultPageProps {
   result: CreativeProfile;
   userName: string;
+  userRegion?: string; // Added for country emoji
   onRestart: () => void;
   onShare: () => void;
 }
@@ -12,13 +13,80 @@ interface ResultPageProps {
 export const ResultPage: React.FC<ResultPageProps> = ({ 
   result, 
   userName, 
+  userRegion, 
   onRestart, 
   onShare 
 }) => {
+  // Map of country/region names to flag emojis
+  const regionToEmoji: Record<string, string> = {
+    "United States": "🇺🇸",
+    "Canada": "🇨🇦",
+    "United Kingdom": "🇬🇧",
+    "Germany": "🇩🇪",
+    "France": "🇫🇷",
+    "Australia": "🇦🇺",
+    "Japan": "🇯🇵",
+    "China": "🇨🇳",
+    "South Korea": "🇰🇷",
+    "Singapore": "🇸🇬",
+    "Other": "🌍"
+  };
+  
+  // Get the flag emoji based on the user's region
+  const regionEmoji = userRegion ? (regionToEmoji[userRegion] || "🌍") : "";
   const [showDetails, setShowDetails] = useState(false);
   const [celebrationPhase, setCelebrationPhase] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [personalizedInsights, setPersonalizedInsights] = useState<string[]>([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const resultCardRef = useRef<HTMLDivElement>(null);
+  
+  // Function to generate and download a share image
+  const generateShareImage = () => {
+    setShowShareModal(true);
+  };
+
+  // Function to handle the share action
+  const handleShare = (platform: string) => {
+    const shareText = `I'm a ${result.title}! Just discovered my Creative DNA type with the HOTO test. Find out yours at hoto-dna-test.com`;
+    const hashtags = '#CreativeDNA #HOTO #Creativity';
+    
+    // Different sharing links based on platform
+    const shareLinks: Record<string, string> = {
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&hashtags=${encodeURIComponent(hashtags.replace('#', ''))}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(shareText)}`,
+      linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent('My Creative DNA Results')}&summary=${encodeURIComponent(shareText)}`,
+      whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + window.location.href)}`
+    };
+    
+    // Handle local save
+    if (platform === 'local') {
+      const message = 'Feature coming soon: This would save the image to your device.';
+      alert(message);
+      return;
+    }
+    
+    // Open share URL in a new window
+    if (shareLinks[platform]) {
+      window.open(shareLinks[platform], '_blank');
+    } else {
+      // Native share API fallback
+      if (navigator.share) {
+        navigator.share({
+          title: 'My Creative DNA Results',
+          text: shareText,
+          url: window.location.href
+        }).catch(console.error);
+      } else {
+        // Copy to clipboard fallback
+        navigator.clipboard.writeText(shareText + ' ' + window.location.href)
+          .then(() => alert('Share text copied to clipboard!'))
+          .catch(() => alert('Unable to copy to clipboard.'));
+      }
+    }
+    
+    setShowShareModal(false);
+  };
 
   // Generate personalized insights based on result type
   useEffect(() => {
@@ -118,7 +186,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                   Achievement Unlocked!
                 </h2>
                 <p className="text-white/70">
-                  Welcome to the {result.title} family, {userName}!
+                  Welcome to the {result.title} family, {userName}{regionEmoji ? ` ${regionEmoji}` : ""}!
                 </p>
               </div>
             )}
@@ -144,6 +212,19 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                   <p className="text-white/90 text-lg leading-relaxed max-w-sm mx-auto">
                     {result.description}
                   </p>
+                  
+                  {/* Custom bookmark with user name - dynamic width based on name length */}
+                  <div className="relative h-10 mt-4">
+                    <div 
+                      className="absolute right-0 h-full rounded-l-md bg-white/20 flex items-center justify-center px-4 backdrop-blur-sm transition-all"
+                      style={{
+                        // Adjust width based on user name length (min 100px, max 200px)
+                        width: `${Math.max(100, Math.min(200, 80 + userName.length * 10))}px`
+                      }}
+                    >
+                      <span className="text-white font-medium">{userName} {regionEmoji}</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Personal Stats */}
@@ -247,23 +328,23 @@ export const ResultPage: React.FC<ResultPageProps> = ({
         {/* Share Card Preview */}
         <div className="glass-morphism p-6 rounded-xl animate-fade-in" style={{ animationDelay: '1.1s' }}>
           <h3 className="font-bold text-white mb-4 text-center">Share Your DNA</h3>
-          <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-4 rounded-xl mb-4">
+          <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-4 rounded-xl mb-4" ref={resultCardRef}>
             <div className="text-center text-white space-y-2">
               <div className="text-xs opacity-75">I just discovered my Creative DNA!</div>
               <div className="font-bold text-lg">{result.title}</div>
-              <div className="text-xs opacity-75">Find yours at HOTO Creative DNA Lab</div>
+              <div className="text-sm opacity-90 mt-1">@{userName} {regionEmoji}</div>
+              <div className="text-xs opacity-75 mt-2">Find yours at HOTO Creative DNA Lab</div>
+              <div className="w-24 h-24 mx-auto mt-2 flex items-center justify-center bg-white/20 rounded-md">
+                <div className="text-xs">QR Code</div>
+              </div>
             </div>
           </div>
           
           {/* Social Share Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={onShare} className="btn-primary flex items-center justify-center space-x-2">
-              <span>📸</span>
-              <span>Instagram Story</span>
-            </button>
-            <button onClick={onShare} className="btn-secondary flex items-center justify-center space-x-2">
-              <span>🐦</span>
-              <span>Tweet</span>
+          <div className="flex flex-wrap gap-2 justify-center">
+            <button onClick={() => generateShareImage()} className="btn-primary text-sm py-2 px-4 flex items-center space-x-1">
+              <span>💾</span>
+              <span>SAVE RESULT</span>
             </button>
           </div>
         </div>
@@ -274,6 +355,57 @@ export const ResultPage: React.FC<ResultPageProps> = ({
             🔄 DISCOVER ANOTHER DNA
           </button>
         </div>
+        
+        {/* Share Modal */}
+        {showShareModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+            <div className="bg-card p-6 rounded-2xl max-w-sm w-full animate-scale-in">
+              <h3 className="text-xl font-bold mb-6 text-center">Share Your Results</h3>
+              
+              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-6 rounded-xl mb-6">
+                <div className="text-center text-white space-y-3">
+                  <div className="text-sm">My Creative DNA is:</div>
+                  <div className="text-2xl font-bold">{result.title}</div>
+                  <div className="text-sm">{userName} {regionEmoji}</div>
+                  <div className="w-24 h-24 mx-auto mt-2 flex items-center justify-center bg-white/20 rounded-md">
+                    <div className="text-xs">QR Code</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <h4 className="col-span-2 text-center text-sm font-medium mb-2">Share by:</h4>
+                
+                <button onClick={() => handleShare('local')} className="btn-secondary text-sm py-2 flex items-center justify-center space-x-1">
+                  <span>💾</span>
+                  <span>Local Save</span>
+                </button>
+                
+                <button onClick={() => handleShare('twitter')} className="btn-secondary text-sm py-2 flex items-center justify-center space-x-1 bg-blue-500/20">
+                  <span>🐦</span>
+                  <span>Twitter</span>
+                </button>
+                
+                <button onClick={() => handleShare('facebook')} className="btn-secondary text-sm py-2 flex items-center justify-center space-x-1 bg-blue-600/20">
+                  <span>👤</span>
+                  <span>Facebook</span>
+                </button>
+                
+                <button onClick={() => handleShare('whatsapp')} className="btn-secondary text-sm py-2 flex items-center justify-center space-x-1 bg-green-500/20">
+                  <span>💬</span>
+                  <span>WhatsApp</span>
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => setShowShareModal(false)}
+                className="btn-secondary w-full text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Thank You with Stats */}
         <div className="text-center space-y-2 animate-fade-in" style={{ animationDelay: '1.3s' }}>

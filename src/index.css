@@ -6,6 +6,46 @@
 
 @layer base {
   :root {
+    /* 响应式设计系统变量 */
+    --responsive-scale: 1;
+    --container-width: 100vw;
+    --container-height: 100vh;
+    --base-font-size: 16px;
+    --base-spacing: 8px;
+    --device-type: mobile;
+
+    /* 响应式字体尺寸 */
+    --text-xs: calc(0.75rem * var(--responsive-scale));
+    --text-sm: calc(0.875rem * var(--responsive-scale));
+    --text-base: calc(1rem * var(--responsive-scale));
+    --text-lg: calc(1.125rem * var(--responsive-scale));
+    --text-xl: calc(1.25rem * var(--responsive-scale));
+    --text-2xl: calc(1.5rem * var(--responsive-scale));
+    --text-3xl: calc(1.875rem * var(--responsive-scale));
+    --text-4xl: calc(2.25rem * var(--responsive-scale));
+    --text-5xl: calc(3rem * var(--responsive-scale));
+    --text-6xl: calc(3.75rem * var(--responsive-scale));
+
+    /* 响应式间距 */
+    --spacing-1: calc(0.25rem * var(--responsive-scale));
+    --spacing-2: calc(0.5rem * var(--responsive-scale));
+    --spacing-3: calc(0.75rem * var(--responsive-scale));
+    --spacing-4: calc(1rem * var(--responsive-scale));
+    --spacing-6: calc(1.5rem * var(--responsive-scale));
+    --spacing-8: calc(2rem * var(--responsive-scale));
+    --spacing-12: calc(3rem * var(--responsive-scale));
+    --spacing-16: calc(4rem * var(--responsive-scale));
+    --spacing-24: calc(6rem * var(--responsive-scale));
+    --spacing-32: calc(8rem * var(--responsive-scale));
+
+    /* 响应式圆角 */
+    --rounded-sm: calc(0.125rem * var(--responsive-scale));
+    --rounded: calc(0.25rem * var(--responsive-scale));
+    --rounded-md: calc(0.375rem * var(--responsive-scale));
+    --rounded-lg: calc(0.5rem * var(--responsive-scale));
+    --rounded-xl: calc(0.75rem * var(--responsive-scale));
+    --rounded-2xl: calc(1rem * var(--responsive-scale));
+    --rounded-3xl: calc(1.5rem * var(--responsive-scale));
     /* 🧬 DNA Theme Color System */
     --background: 220 25% 8%;
     --foreground: 210 40% 98%;
@@ -155,7 +195,7 @@
   * {
     @apply border-0;
   }
-
+  
   body {
     @apply bg-background text-foreground overflow-hidden;
     background: var(--gradient-hero);
@@ -190,6 +230,131 @@
 }
 
 @layer components {
+  
+  /* 响应式工具类 */
+  .responsive-container {
+    --responsive-scale: 1;
+  }
+
+  /* 按纵横比做轻微缩放补偿，避免出现大面积留白或元素过密 */
+  .responsive-container[data-ar-band="tall"] {
+    --responsive-scale: calc(var(--responsive-scale) * 1.06);
+  }
+  .responsive-container[data-ar-band="wide"] {
+    --responsive-scale: calc(var(--responsive-scale) * 0.94);
+  }
+
+  /* 设备特定样式 */
+  .responsive-container[data-device-type="tablet"] {
+    /* 平板优化 */
+  }
+
+  .responsive-container[data-device-type="desktop"] {
+    /* 桌面优化 */
+  }
+
+  .responsive-container[data-orientation="landscape"] {
+    /* 横屏优化 */
+  }
+
+  /* 响应式文本类 */
+  .r-text-xs { font-size: var(--text-xs); }
+  .r-text-sm { font-size: var(--text-sm); }
+  .r-text-base { font-size: var(--text-base); }
+  .r-text-lg { font-size: var(--text-lg); }
+  .r-text-xl { font-size: var(--text-xl); }
+  .r-text-2xl { font-size: var(--text-2xl); }
+  .r-text-3xl { font-size: var(--text-3xl); }
+  .r-text-4xl { font-size: var(--text-4xl); }
+  .r-text-5xl { font-size: var(--text-5xl); }
+  .r-text-6xl { font-size: var(--text-6xl); }
+
+  /* 页面元素针对纵横比的定向微调（以 class 钩子选择） */
+  .responsive-container[data-ar-band="wide"] .landing-ascii-bg img {
+    transform: scale(0.92);
+    opacity: 0.6;
+  }
+  .responsive-container[data-ar-band="tall"] .landing-ascii-bg img {
+    transform: scale(1.06);
+    opacity: 0.75;
+  }
+
+  .responsive-container[data-ar-band="wide"] .question-ascii-right {
+    width: 32% !important;
+  }
+  .responsive-container[data-ar-band="tall"] .question-ascii-right {
+    width: 45% !important;
+  }
+  .responsive-container[data-ar-band="wide"] .question-ascii-left {
+    width: 28% !important;
+  }
+  .responsive-container[data-ar-band="tall"] .question-ascii-left {
+    width: 40% !important;
+  }
+
+  /* 响应式间距类 */
+  .r-p-1 { padding: var(--spacing-1); }
+  .r-p-2 { padding: var(--spacing-2); }
+  .r-p-3 { padding: var(--spacing-3); }
+  .r-p-4 { padding: var(--spacing-4); }
+  .r-p-6 { padding: var(--spacing-6); }
+  .r-p-8 { padding: var(--spacing-8); }
+  .r-p-12 { padding: var(--spacing-12); }
+  .r-p-16 { padding: var(--spacing-16); }
+  .r-p-24 { padding: var(--spacing-24); }
+  .r-p-32 { padding: var(--spacing-32); }
+
+  .r-m-1 { margin: var(--spacing-1); }
+  .r-m-2 { margin: var(--spacing-2); }
+  .r-m-3 { margin: var(--spacing-3); }
+  .r-m-4 { margin: var(--spacing-4); }
+  .r-m-6 { margin: var(--spacing-6); }
+  .r-m-8 { margin: var(--spacing-8); }
+  .r-m-12 { margin: var(--spacing-12); }
+  .r-m-16 { margin: var(--spacing-16); }
+  .r-m-24 { margin: var(--spacing-24); }
+  .r-m-32 { margin: var(--spacing-32); }
+
+  /* 响应式宽度和高度 */
+  .r-w-6 { width: calc(1.5rem * var(--responsive-scale)); }
+  .r-w-8 { width: calc(2rem * var(--responsive-scale)); }
+  .r-w-12 { width: calc(3rem * var(--responsive-scale)); }
+  .r-w-16 { width: calc(4rem * var(--responsive-scale)); }
+  .r-w-24 { width: calc(6rem * var(--responsive-scale)); }
+  .r-w-32 { width: calc(8rem * var(--responsive-scale)); }
+
+  .r-h-6 { height: calc(1.5rem * var(--responsive-scale)); }
+  .r-h-8 { height: calc(2rem * var(--responsive-scale)); }
+  .r-h-12 { height: calc(3rem * var(--responsive-scale)); }
+  .r-h-16 { height: calc(4rem * var(--responsive-scale)); }
+  .r-h-24 { height: calc(6rem * var(--responsive-scale)); }
+  .r-h-32 { height: calc(8rem * var(--responsive-scale)); }
+
+  /* 响应式圆角 */
+  .r-rounded-sm { border-radius: var(--rounded-sm); }
+  .r-rounded { border-radius: var(--rounded); }
+  .r-rounded-md { border-radius: var(--rounded-md); }
+  .r-rounded-lg { border-radius: var(--rounded-lg); }
+  .r-rounded-xl { border-radius: var(--rounded-xl); }
+  .r-rounded-2xl { border-radius: var(--rounded-2xl); }
+  .r-rounded-3xl { border-radius: var(--rounded-3xl); }
+
+  /* 智能字体缩放 */
+  .smart-text {
+    font-size: clamp(0.875rem, calc(0.875rem + 0.5vw), 1.125rem);
+    line-height: 1.5;
+  }
+
+  .smart-title {
+    font-size: clamp(1.5rem, calc(1.5rem + 2vw), 3rem);
+    line-height: 1.2;
+  }
+
+  .smart-subtitle {
+    font-size: clamp(1.125rem, calc(1.125rem + 1vw), 1.5rem);
+    line-height: 1.4;
+  }
+  
   /* Page Container */
   .page-container {
     @apply h-screen w-full flex flex-col items-center justify-center relative;
@@ -268,6 +433,168 @@
     50% { transform: translateX(0%) scaleX(1); }
     100% { transform: translateX(100%) scaleX(0); }
   }
+  
+  /* Bookmark Animation Elements */
+  .bookmark-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5%;
+    overflow: hidden;
+  }
+  
+  .bookmark {
+    width: 60px;
+    height: 30px;
+    background: var(--gradient-primary);
+    border-radius: 0 0 10px 10px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    transform: translateY(-100%);
+    animation: bookmark-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  
+  .bookmark::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+  }
+  
+  .bookmark:nth-child(1) {
+    background: var(--gradient-primary);
+    animation-delay: 0.1s;
+  }
+  
+  .bookmark:nth-child(2) {
+    background: var(--gradient-accent);
+    animation-delay: 0.3s;
+  }
+  
+  .bookmark:nth-child(3) {
+    background: var(--gradient-success);
+    animation-delay: 0.5s;
+  }
+  
+  .bookmark:nth-child(4) {
+    background: var(--gradient-purple);
+    animation-delay: 0.7s;
+  }
+  
+  @keyframes bookmark-drop {
+    0% { transform: translateY(-100%) skewX(-12deg); opacity: 0; }
+    70% { transform: translateY(10%) skewX(-12deg); opacity: 1; }
+    85% { transform: translateY(-5%) skewX(-12deg); opacity: 1; }
+    100% { transform: translateY(0) skewX(-12deg); opacity: 1; }
+  }
+  
+  .animate-bookmark-drop {
+    animation: bookmark-drop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transform: translateY(-100%) skewX(-12deg);
+    opacity: 0;
+  }
+
+  /* Elegant continuous hop wave (left-to-right) */
+  @keyframes bookmark-hop {
+    0%   { transform: translateY(0) skewX(-12deg); }
+    35%  { transform: translateY(-7px) skewX(-12deg); }
+    70%  { transform: translateY(0) skewX(-12deg); }
+    100% { transform: translateY(0) skewX(-12deg); }
+  }
+
+  .bookmark-wave {
+    /* Two animations layered: drop once, then continuous hop */
+    animation-name: bookmark-drop, bookmark-hop;
+    animation-duration: 0.8s, var(--hop-duration, 1.8s);
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1), ease-in-out;
+    animation-delay: 0s, calc(0.9s + var(--wave-delay, 0s));
+    animation-iteration-count: 1, infinite;
+    animation-fill-mode: forwards, both;
+  }
+
+  /* Stagger wave delays from left to right (avoid color overrides by not relying on .bookmark) */
+  .bookmark-container .bookmark-wave:nth-child(1) { --wave-delay: 0s; }
+  .bookmark-container .bookmark-wave:nth-child(2) { --wave-delay: 0.15s; }
+  .bookmark-container .bookmark-wave:nth-child(3) { --wave-delay: 0.30s; }
+  .bookmark-container .bookmark-wave:nth-child(4) { --wave-delay: 0.45s; }
+  .bookmark-container .bookmark-wave:nth-child(5) { --wave-delay: 0.60s; }
+  
+  /* ASCII Art Slide In Animation */
+  @keyframes ascii-slide-in {
+    0% { 
+      opacity: 0;
+      transform: translateX(-50%) translateY(50px) scale(0.9);
+    }
+    100% { 
+      opacity: 0.7;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+  
+  .animate-ascii-slide-in {
+    animation: ascii-slide-in 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.8s;
+    opacity: 0;
+  }
+
+  /* Centered ASCII fade-in (no X offset) */
+  @keyframes ascii-fade-center {
+    0% {
+      opacity: 0;
+      transform: translateY(50px) scale(0.96);
+    }
+    100% {
+      opacity: 0.7;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .animate-ascii-fade-center {
+    animation: ascii-fade-center 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+  }
+  
+  /* Button Slide Up Animation - Smooth */
+  @keyframes button-slide-up {
+    0% { 
+      opacity: 0;
+      transform: translateX(-50%) translateY(30px) skewX(-12deg);
+    }
+    100% { 
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) skewX(-12deg);
+    }
+  }
+  
+  .animate-button-slide-up {
+    animation: button-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+  
+  /* Text Fade Up Animation - Smooth */
+  @keyframes text-fade-up {
+    0% { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-text-fade-up {
+    animation: text-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
 
   /* Animations */
   @keyframes pulse-glow {
@@ -331,6 +658,24 @@
 
   .animate-scale-in {
     animation: scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Decorative image treatments for question pages */
+  .deco-black {
+    filter: grayscale(1) contrast(1.8) brightness(0.95);
+    opacity: 0.5;
+  }
+  .deco-yellow {
+    /* approximate brand yellow tint via filter chain */
+    filter: grayscale(1) sepia(1) hue-rotate(8deg) saturate(900%) brightness(1.08) contrast(1.35);
+    opacity: 0.45;
+  }
+
+  /* Landing start button: clamp尺寸避免小屏过大 */
+  .landing-start .landing-start-btn {
+    font-size: clamp(16px, calc(18px * var(--responsive-scale)), 20px);
+    padding: clamp(10px, calc(12px * var(--responsive-scale)), 16px)
+             clamp(28px, calc(36px * var(--responsive-scale)), 44px);
   }
 
   .page-transition-enter {
@@ -464,6 +809,7 @@
     inset: 0;
     background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), hsl(var(--creative-orange) / 0.3) 0%, transparent 50%);
     animation: particle-burst 0.6s ease-out;
+    z-index: 1;
   }
 
   @keyframes particle-burst {
@@ -632,5 +978,56 @@
   @keyframes pulse-dot {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* 优雅的文字跳动入场动画 */
+  @keyframes bounce-in {
+    0% { 
+      opacity: 0;
+      transform: translateY(30px) scale(0.9); 
+    }
+    40% { 
+      opacity: 0.8;
+      transform: translateY(-12px) scale(1.05); 
+    }
+    65% { 
+      opacity: 1;
+      transform: translateY(6px) scale(0.98); 
+    }
+    80% { 
+      transform: translateY(-4px) scale(1.01); 
+    }
+    90% { 
+      transform: translateY(2px) scale(0.995); 
+    }
+    100% { 
+      opacity: 1;
+      transform: translateY(0) scale(1); 
+    }
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+
+  /* 优雅的按钮悬停效果 */
+  .elegant-hover {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .elegant-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 优雅的选中状态效果 */
+  .selected-highlight {
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    transform: translateY(-1px);
+  }
+
+  /* 微妙的缩放悬浮效果 */
+  .hover\:scale-102:hover {
+    transform: scale(1.02);
   }
 }

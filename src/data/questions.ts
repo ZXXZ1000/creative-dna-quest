@@ -3,168 +3,168 @@ import { Question, CreativeProfile } from '../types/test';
 export const questions: Question[] = [
   {
     id: 1,
-    text: "When starting a new project, what's your first instinct?",
+    text: "Your :) ideal Saturday morning starts with...",
     options: [
       {
         id: 1,
-        text: "Plan every detail and organize resources",
+        text: "Organizing & planning work",
         scores: { TIDY: 2 }
       },
       {
         id: 2,
-        text: "Set the perfect mood and ambiance",
+        text: "Lounging at home",
         scores: { ILLUMA: 2 }
       },
       {
         id: 3,
-        text: "Dive in and explore possibilities",
+        text: "Heading outdoors",
         scores: { NOMAD: 2 }
       }
     ]
   },
   {
     id: 2,
-    text: "Your ideal weekend workshop involves:",
+    text: "Your laptop starts (=д=) overheating and running super slow...",
     options: [
       {
         id: 1,
-        text: "Building something functional from scratch",
+        text: "Open it up",
         scores: { MAKER: 2 }
       },
       {
         id: 2,
-        text: "Improving existing tools and methods",
+        text: "Research first",
         scores: { REFORM: 1, MAKER: 1 }
       },
       {
         id: 3,
-        text: "Creating something beautiful and atmospheric",
+        text: "Quick restart",
         scores: { ILLUMA: 2 }
       }
     ]
   },
   {
     id: 3,
-    text: "When choosing tools, you prioritize:",
+    text: "Your phone's photo library is mostly filled with...",
     options: [
       {
         id: 1,
-        text: "Reliability and proven track record",
+        text: "Organized work pics",
         scores: { TIDY: 2 }
       },
       {
         id: 2,
-        text: "Versatility and atmospheric quality",
+        text: "Sunsets & nature beauty",
         scores: { ILLUMA: 2 }
       },
       {
         id: 3,
-        text: "Portability and adventure-readiness",
+        text: "Random life moments",
         scores: { NOMAD: 2 }
       }
     ]
   },
   {
     id: 4,
-    text: "Your approach to problem-solving is:",
+    text: "You see a cool DIY project online...",
     options: [
       {
         id: 1,
-        text: "Systematic and methodical",
+        text: "Save it with detailed plans",
         scores: { MAKER: 2 }
       },
       {
         id: 2,
-        text: "Innovative and experimental",
+        text: "Imagine your own version",
         scores: { REFORM: 2 }
       },
       {
         id: 3,
-        text: "Aesthetic and visually-driven",
+        text: "Try it now",
         scores: { VISUAL: 2 }
       }
     ]
   },
   {
     id: 5,
-    text: "In a team setting, you naturally:",
+    text: "You're (ಠ.ಠ)ง assembling IKEA furniture...",
     options: [
       {
         id: 1,
-        text: "Organize tasks and ensure quality",
+        text: "Follow instructions exactly",
         scores: { MAKER: 1, TIDY: 1 }
       },
       {
         id: 2,
-        text: "Push boundaries and suggest improvements",
+        text: "Add personal modifications",
         scores: { REFORM: 2 }
       },
       {
         id: 3,
-        text: "Focus on presentation and user experience",
+        text: "Make it Instagram-worthy",
         scores: { VISUAL: 2 }
       }
     ]
   },
   {
     id: 6,
-    text: "Your workspace style reflects:",
+    text: "If you were a vlogger, you'd most want to share...",
     options: [
       {
         id: 1,
-        text: "Clean organization and efficiency",
+        text: "Step-by-step tutorials",
         scores: { TIDY: 2 }
       },
       {
         id: 2,
-        text: "Functional tools within easy reach",
+        text: "Creation process",
         scores: { MAKER: 1, REFORM: 1 }
       },
       {
         id: 3,
-        text: "Inspiring aesthetics and mood lighting",
+        text: "Perfectly styled moments",
         scores: { VISUAL: 1, ILLUMA: 1 }
       }
     ]
   },
   {
     id: 7,
-    text: "When learning something new, you prefer:",
+    text: "Your (^▽^) shopping style is...",
     options: [
       {
         id: 1,
-        text: "Step-by-step instructions and practice",
+        text: "Research & plan first",
         scores: { MAKER: 1, TIDY: 1 }
       },
       {
         id: 2,
-        text: "Exploring and discovering your own way",
+        text: "Buy what sparks joy",
         scores: { NOMAD: 2 }
       },
       {
         id: 3,
-        text: "Understanding the artistry and vision behind it",
+        text: "Get the trendy stuff",
         scores: { ILLUMA: 1, VISUAL: 1 }
       }
     ]
   },
   {
     id: 8,
-    text: "Your motivation comes from:",
+    text: "You're stuck in an elevator for 30 minutes... (^_^)",
     options: [
       {
         id: 1,
-        text: "Perfecting and optimizing systems",
+        text: "Try to fix it yourself",
         scores: { REFORM: 2 }
       },
       {
         id: 2,
-        text: "Freedom and new experiences",
+        text: "Chat with strangers inside",
         scores: { NOMAD: 2 }
       },
       {
         id: 3,
-        text: "Creating beautiful, impactful designs",
+        text: "Think & plan stuff",
         scores: { VISUAL: 2 }
       }
     ]

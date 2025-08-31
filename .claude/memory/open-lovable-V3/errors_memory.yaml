@@ -1,0 +1,181 @@
+# Open Lovable V3 错误记忆库（累积学习）
+
+errors:
+  - id: ERR-0001
+    title: "研究方法论缺失"
+    fingerprint: "盲目源码阅读，Deep Wiki工具未使用"
+    trigger: "直接进入源码分析，跳过算法理解阶段"
+    impact: "效率低下，理解不深入，容易陷入实现细节"
+    root_cause: "缺乏系统性研究方法论"
+    fix: "建立Deep Wiki → Ultra Think → 源码验证的标准流程"
+    prevention: ["严格遵循研究方法论", "每次重读工作流程", "更新CLAUDE.md指导"]
+    owner: Coordinator
+    date: "2025-08-28"
+
+  - id: ERR-0002
+    title: "前后端联调测试不充分"
+    fingerprint: "API测试通过但前端按钮无响应"
+    trigger: "只进行API endpoint测试，未测试实际用户交互"
+    impact: "用户无法使用核心功能，点击按钮无反应"
+    root_cause: "缺少端到端的用户交互测试流程"
+    fix: "建立完整的前端按钮点击→API调用→状态更新→UI反馈测试链路"
+    prevention: ["每个按钮必须测试实际点击", "验证loading/error/success状态", "检查用户反馈机制"]
+    owner: Coordinator
+    date: "2025-08-28"
+
+  - id: ERR-0009
+    title: "expectedOrigin作用域错误"
+    fingerprint: "writeFileToStackBlitz内handleResponse取不到expectedOrigin变量"
+    trigger: "在函数内部定义expectedOrigin，但在外部回调中使用"
+    impact: "postMessage无法正确发送，跨域验证失败"
+    root_cause: "JavaScript闭包作用域问题，变量定义位置错误"
+    fix: "将expectedOrigin定义移动到函数最外层"
+    prevention: ["仔细检查变量作用域", "使用ESLint检测未定义变量"]
+    owner: Claude
+    date: "2025-08-28"
+
+  - id: ERR-0010
+    title: "跨域访问contentWindow直接抛异常"
+    fingerprint: "访问iframe.contentWindow.webcontainerInstance时安全异常"
+    trigger: "跨域iframe访问任何属性都会抛安全异常，即使使用?."
+    impact: "方法1完全失效，需要依赖方法2桥接器"
+    root_cause: "浏览器同源策略，跨域不允许访问iframe内部对象"
+    fix: "用try-catch包装访问，失败时使用桥接方案"
+    prevention: ["假设跨域场景", "优先设计桥接通信", "SDK访问作为加分项"]
+    owner: Claude
+    date: "2025-08-28"
+
+  - id: ERR-0011
+    title: "白名单匹配多斜杠问题"
+    fingerprint: "src/**匹配时产生src//路径，导致匹配失败"
+    trigger: "pattern.slice(0, -3)得到'src/'，再拼接'/'变成'src//'"
+    impact: "文件白名单保护失效，可能允许非法路径操作"
+    root_cause: "字符串处理逻辑错误，重复添加路径分隔符"
+    fix: "去掉多余的'/'拼接，直接使用prefix"
+    prevention: ["仔细处理路径字符串", "添加路径匹配单测", "使用路径库标准化"]
+    owner: Claude
+    date: "2025-08-28"
+
+  - id: ERR-0012
+    title: "NodeJS.Timeout类型在浏览器环境错误"
+    fingerprint: "setTimeout在浏览器返回number，不是NodeJS.Timeout"
+    trigger: "使用Node.js类型定义在浏览器TypeScript环境"
+    impact: "TypeScript编译错误，类型检查失败"
+    root_cause: "混用Node.js和浏览器环境的类型定义"
+    fix: "使用number类型，明确调用window.setTimeout"
+    prevention: ["区分环境类型定义", "使用DOM类型而非Node类型", "配置正确的tsconfig lib"]
+    owner: Claude
+    date: "2025-08-28"
+
+  - id: ERR-0013
+    title: "验证环事件监听器泄漏"
+    fingerprint: "verifySuccess注册的监听器未在resolve时清理"
+    trigger: "多次修复时叠加注册onBuildSuccess/onNewError监听器"
+    impact: "内存泄漏，事件响应异常，可能影响后续修复判断"
+    root_cause: "事件监听器生命周期管理不当，缺少清理机制"
+    fix: "添加cleanup函数，统一清理所有监听器和定时器"
+    prevention: ["监听器必须有对应清理", "使用AbortController统一管理", "及时测试内存泄漏"]
+    owner: Claude
+    date: "2025-08-28"
+
+  - id: ERR-0014
+    title: "前端错误捕获架构设计误区"
+    fingerprint: "初始设计假设用户要参与调试过程，暴露技术细节"
+    trigger: "传统调试思维，认为用户需要看到错误信息才能理解问题"
+    impact: "产品体验与非专业用户需求严重不符，增加用户困惑"
+    root_cause: "产品定位理解偏差，技术视角而非用户视角"
+    fix: "转向隐形AI助手设计，用户只感受到应用变好了"
+    prevention: ["始终从用户角度思考", "Never break userspace原则", "隐藏所有技术实现细节"]
+    owner: Claude
+    date: "2025-08-28"
+
+  - id: ERR-0015
+    title: "Svelte 5事件语法混用错误"
+    fingerprint: "混合使用on:click和onclick事件处理语法"
+    trigger: "从Svelte 4升级到Svelte 5时，新旧语法混合使用"
+    impact: "编译错误：'Mixing old (on:keydown) and new syntaxes for event handling is not allowed'"
+    root_cause: "Svelte 5引入新的事件处理语法，不允许新旧语法混用"
+    fix: "统一将所有on:event语法更新为事件属性语法（onclick, onkeydown等）"
+    prevention: ["建立Svelte版本升级检查清单", "使用ESLint规则检测混合语法", "团队培训新语法标准"]
+    owner: Claude
+    date: "2025-08-30"
+
+  - id: ERR-0016
+    title: "Svelte 5响应式变量声明错误"
+    fingerprint: "$state()未使用导致响应式更新失效警告"
+    trigger: "let projectDescription = ''在Svelte 5中不会自动响应式更新"
+    impact: "用户界面状态不同步，输入变化不触发按钮状态更新"
+    root_cause: "Svelte 5改变了响应式变量声明方式，需要显式使用$state()"
+    fix: "将let projectDescription = ''更新为let projectDescription = $state('')"
+    prevention: ["学习Svelte 5响应式系统变化", "建立变量声明规范", "配置IDE插件检测"]
+    owner: Claude
+    date: "2025-08-30"
+
+  - id: ERR-0017
+    title: "Svelte组件未使用export属性警告"
+    fingerprint: "Component has unused export property 'data'"
+    trigger: "export let data;声明但未在组件中实际使用"
+    impact: "编译警告，代码质量问题，可能导致未来维护困惑"
+    root_cause: "组件接口定义与实际使用不一致"
+    fix: "将export let data;更改为export const data = undefined;或移除"
+    prevention: ["定期清理未使用的export属性", "组件接口设计时明确用途", "代码审查检查"]
+    owner: Claude
+    date: "2025-08-30"
+
+  - id: ERR-0018
+    title: "Playwright测试超时配置不当"
+    fingerprint: "Test timeout of 60000ms exceeded在认证重定向测试中"
+    trigger: "测试期望页面重定向到/但实际重定向到/auth"
+    impact: "测试失败，CI/CD流程可能中断，测试覆盖率下降"
+    root_cause: "测试假设与实际应用行为不一致，未登录用户重定向逻辑"
+    fix: "调整测试预期，或修改测试以适应实际的认证流程"
+    prevention: ["测试与实际业务逻辑保持一致", "增加测试的灵活性", "模拟不同用户状态"]
+    owner: Claude
+    date: "2025-08-30"
+
+  - id: ERR-0019
+    title: "Svelte 5 {@const}标签放置位置错误"
+    fingerprint: "`{@const}` must be the immediate child of specific tags"
+    trigger: "在按钮元素内直接使用{@const}标签，不在允许的父元素内"
+    impact: "编译错误，HMR热更新失败，开发体验中断"
+    root_cause: "Svelte 5对{@const}标签的放置位置有严格限制，必须是特定标签的直接子元素"
+    fix: "用{#if}块包裹{@const}标签，确保其在允许的父元素内"
+    prevention: ["熟悉Svelte 5语法规则", "使用IDE插件检测语法错误", "建立组件模板规范"]
+    owner: Claude
+    date: "2025-08-30"
+
+  - id: ERR-0020
+    title: "Monaco Editor依赖缺失错误"
+    fingerprint: "Failed to resolve import \"monaco-editor\" from CodeEditor.svelte"
+    trigger: "在组件中导入monaco-editor但未安装相应npm包"
+    impact: "编译失败，代码编辑器功能无法使用，影响核心开发体验"
+    root_cause: "依赖管理不完整，代码引用了未安装的第三方包"
+    fix: "使用npm install monaco-editor安装缺失依赖"
+    prevention: ["代码评审检查所有import语句", "建立依赖管理清单", "配置precommit hook检查"]
+    owner: Claude
+    date: "2025-08-30"
+
+  - id: ERR-0021
+    title: "HTML字符串中script标签未转义"
+    fingerprint: "Unterminated string literal in embedded HTML with <script> tag"
+    trigger: "在JavaScript字符串中直接写入包含</script>的HTML内容"
+    impact: "构建失败，esbuild无法正确解析代码，开发服务器无法启动"
+    root_cause: "HTML字符串中的script结束标签被解释器误识别为JavaScript代码结束"
+    fix: "将</script>转义为<\\/script>避免解析冲突"
+    prevention: ["HTML模板字符串使用模板字面量", "避免在JS中硬编码HTML", "使用专门的HTML转义库"]
+    owner: Claude
+    date: "2025-08-30"
+
+lessons_learned:
+  - "研究方法论是技术开发的基础"
+  - "Deep Wiki对话比源码阅读效率高10倍"
+  - "Ultra Think分析能处理复杂系统设计"
+  - "前后端联调测试必须覆盖完整用户体验"
+  - "隐形AI助手：用户感受变好，而非看到修复过程"
+  - "框架升级需要系统性语法检查和更新"
+  - "Svelte 5响应式系统需要显式$state()声明"
+  - "有头模式测试能完美展示用户界面交互效果"
+  - "Apple HIG设计原则能显著提升用户体验质量"
+  - "Svelte 5对标签放置位置有严格限制，{@const}必须在特定父元素内"
+  - "依赖管理是项目稳定性的关键，import语句必须与package.json一致"
+  - "HTML字符串中的script标签需要转义，避免解析器冲突"

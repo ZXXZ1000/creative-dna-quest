@@ -1,0 +1,26 @@
+{
+    "env": {
+      "ANTHROPIC_AUTH_TOKEN": "sk-0064e6da3af14ce886fdf5d58c8e83b7",
+      "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+      "ANTHROPIC_MODEL": "deepseek-reasoner"
+    },
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(conda activate:*)",
+      "Bash(source:*)",
+      "Bash(pytest:*)",
+      "mcp__zen__chat",
+      "Bash(jq length:*)"
+    ],
+    "deny": []
+  },
+ 
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "zen"
+  ]
+}

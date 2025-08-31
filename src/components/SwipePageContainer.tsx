@@ -22,7 +22,11 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
   const velocityRef = useRef(0);
   const lastTimeRef = useRef(0);
 
-  const threshold = window.innerHeight * 0.3; // 30% of screen height
+  // 获取更准确的可视高度（支持移动端浏览器地址栏动态变化）
+  const getViewportHeight = () => window.visualViewport?.height ?? window.innerHeight;
+
+  // 滑动阈值（基于可视高度）
+  const threshold = getViewportHeight() * 0.25; // 降低阈值，更容易滑动
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!enableSwipe || isTransitioning) return;
@@ -49,13 +53,13 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
 
     const offset = touch.clientY - startYRef.current;
     
-    // 基础限制滑动范围
-    const maxOffset = window.innerHeight * 0.6;
+    // 滑动范围（基于可视高度）
+    const maxOffset = getViewportHeight() * 0.5; // 减小最大滑动距离
     let finalOffset = Math.max(-maxOffset, Math.min(maxOffset, offset));
     
-    // 边界阻尼效果
-    const dampingStrength = 0.3;
-    const boundaryThreshold = window.innerHeight * 0.2;
+    // 更柔和的边界阻尼效果
+    const dampingStrength = 0.25;
+    const boundaryThreshold = getViewportHeight() * 0.15;
     
     // 在第一页向下滑动时添加阻尼
     if (currentIndex === 0 && finalOffset > 0) {
@@ -95,8 +99,8 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
     let shouldChangePage = false;
     let newIndex = currentIndex;
 
-    // 更智能的页面切换判断
-    const velocityThreshold = 0.3; // 降低速度阈值，更容易触发
+    // 页面切换判断
+    const velocityThreshold = 0.25; // 进一步降低速度阈值
     const distanceThreshold = threshold;
 
     // 基于距离或速度判断
@@ -129,7 +133,7 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
     // 动画完成后重置状态
     setTimeout(() => {
       setIsTransitioning(false);
-    }, 300);
+    }, 600);
   };
 
   // 当外部改变currentIndex时，确保容器位置正确
@@ -140,7 +144,7 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
   }, [currentIndex, isDragging, isTransitioning]);
 
   const getTransform = (index: number) => {
-    const baseTranslateY = (index - currentIndex) * window.innerHeight;
+    const baseTranslateY = (index - currentIndex) * getViewportHeight();
     const currentOffset = isDragging ? dragOffset : 0;
     
     return `translateY(${baseTranslateY + currentOffset}px)`;
@@ -148,19 +152,20 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
 
   const getTransition = () => {
     if (isDragging) return 'none';
-    return 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    return 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
   };
 
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-screen overflow-hidden touch-none glow-bg"
+      className="relative w-full h-[100dvh] overflow-hidden touch-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{ 
         touchAction: 'none',
-        background: 'var(--gradient-dark)'
+        background: '#ffffff',
+        height: '100dvh' // 作为 Tailwind h-[100dvh] 的内联兜底
       }}
     >
       {children.map((child, index) => (

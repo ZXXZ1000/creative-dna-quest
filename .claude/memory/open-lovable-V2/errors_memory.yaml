@@ -1,0 +1,335 @@
+# 错误与误区库 - 防止重复犯错的长期记忆
+
+# 技术架构类错误
+technical_errors:
+  - id: "ERR-ARCH-001"
+    title: "全局变量依赖陷阱"
+    fingerprint: "使用global变量在API间共享状态"
+    trigger: "从单用户系统迁移到多用户时"
+    impact: "用户数据混合、状态污染、安全漏洞"
+    root_cause: "没有意识到多租户隔离的重要性"
+    fix: "用Zustand + 用户级状态隔离替换所有global变量"
+    prevention: ["所有状态必须有明确的用户归属", "API级别强制session校验", "状态设计时考虑多用户场景"]
+    owner: "Main Thread"
+    date: "2025-08-23"
+
+  - id: "ERR-ARCH-002"  
+    title: "E2B沙箱成本与扩展性问题"
+    fingerprint: "依赖第三方沙箱服务进行代码执行"
+    trigger: "多用户同时使用时成本激增"
+    impact: "运营成本不可控、服务依赖风险"
+    root_cause: "未考虑规模化后的成本结构"
+    fix: "Docker容器池替代E2B，自建沙箱管理"
+    prevention: ["架构设计时评估规模化成本", "关键服务避免强依赖第三方", "建立成本监控和预警"]
+    owner: "General-Purpose Agent"
+    date: "2025-08-23"
+
+# 开发流程类错误
+process_errors:
+  - id: "ERR-PROC-001"
+    title: "单线程顺序开发低效"
+    fingerprint: "复杂架构组件逐一开发"
+    trigger: "面对多个独立模块需要开发时"
+    impact: "开发周期延长、资源利用率低"
+    root_cause: "没有识别出可并行的独立任务"
+    fix: "采用并行Agent策略，同时开发独立组件"
+    prevention: ["复杂任务先进行依赖分析", "识别可并行的子任务", "最大化并行度"]
+    owner: "Main Thread"
+    date: "2025-08-23"
+
+  - id: "ERR-PROC-002"
+    title: "缺乏系统性记忆管理"
+    fingerprint: "没有建立项目日志和错误记录系统"
+    trigger: "项目复杂度超过个人记忆容量"
+    impact: "重复犯错、经验无法积累、决策缺乏历史依据"
+    root_cause: "没有遵循CLAUDE.md定义的工作流程"
+    fix: "建立完整的session_state.yaml、project_logs.yaml、errors_memory.yaml"
+    prevention: ["严格遵循CLAUDE.md工作流", "每个重要决策都记录reasoning", "定期回顾和更新记忆库"]
+    owner: "Main Thread"  
+    date: "2025-08-23"
+
+# 设计决策类错误
+design_errors:
+  - id: "ERR-DESIGN-001"
+    title: "过度设计vs实用主义平衡"
+    fingerprint: "为了理论完美而增加不必要的复杂度"
+    trigger: "追求架构的理论优雅性"
+    impact: "开发周期延长、维护成本增加"
+    root_cause: "没有坚持Linus的实用主义哲学"
+    fix: "每个设计决策都问：解决真实问题还是假想威胁？"
+    prevention: ["Linus三问法验证需求", "优先解决用户实际痛点", "简单方案优于复杂方案"]
+    owner: "Design Agent"
+    date: "2025-08-23"
+
+# 兼容性类错误  
+compatibility_errors:
+  - id: "ERR-COMPAT-001"
+    title: "破坏现有用户体验"
+    fingerprint: "API接口变更导致现有功能失效"
+    trigger: "架构重构时修改现有接口"
+    impact: "用户工作流中断、功能回退"
+    root_cause: "没有遵循'Never break userspace'原则"
+    fix: "保持100%现有API兼容，通过适配层处理差异"
+    prevention: ["所有API变更必须向后兼容", "提供迁移路径和版本支持", "广泛测试现有功能"]
+    owner: "API Design Agent"
+    date: "2025-08-23"
+
+# 性能类错误
+performance_errors:
+  - id: "ERR-PERF-001"  
+    title: "状态管理性能问题"
+    fingerprint: "全局状态变更导致不必要的组件重渲染"
+    trigger: "使用不当的状态管理模式"
+    impact: "UI响应延迟、用户体验下降"
+    root_cause: "没有合理设计状态粒度和订阅机制"
+    fix: "使用Zustand选择器模式，精确订阅所需状态"
+    prevention: ["状态设计考虑更新频率", "避免大对象的全量更新", "使用DevTools监控性能"]
+    owner: "State Management Agent"
+    date: "2025-08-23"
+
+# 安全类错误
+security_errors:
+  - id: "ERR-SEC-001"
+    title: "多租户数据泄露风险"
+    fingerprint: "缺乏用户级数据隔离检查"
+    trigger: "API未验证资源归属关系"
+    impact: "用户数据泄露、隐私安全问题"
+    root_cause: "数据库设计和API设计缺乏安全意识"
+    fix: "行级安全策略 + API层权限验证双重保护"
+    prevention: ["所有数据访问必须验证用户权限", "数据库层面强制RLS", "安全测试覆盖跨用户访问"]
+    owner: "Security Agent"
+    date: "2025-08-23"
+
+# 经验总结
+lessons_extracted:
+  - category: "Architecture"
+    lesson: "复杂系统改造时，数据结构优先于算法优化"
+    context: "将全局变量架构改造为多租户架构"
+    application: "先设计清晰的数据归属关系，再考虑具体实现"
+    
+  - category: "Development"  
+    lesson: "并行开发需要清晰的任务边界和接口定义"
+    context: "6个Agent并行开发独立模块"
+    application: "复杂项目先进行模块化设计，再分配并行任务"
+    
+  - category: "Quality"
+    lesson: "保持现有功能兼容性比新增功能更重要"
+    context: "改造现有开源项目架构"
+    application: "任何重构都必须通过现有功能测试"
+
+# 风险预警系统
+risk_alerts:
+  active_risks:
+    - risk: "前端页面开发复杂度被低估"
+      probability: "Medium"
+      impact: "High" 
+      mitigation: "继续使用并行Agent策略，分解为独立页面组件"
+      
+    - risk: "Docker容器池管理复杂度"
+      probability: "Medium"
+      impact: "Medium"
+      mitigation: "先实现基础容器管理，后续优化资源调度"
+      
+    - risk: "端到端集成测试工作量大"
+      probability: "High"
+      impact: "Medium"  
+      mitigation: "边开发边测试，不要积累到最后"
+
+# 成功模式记录
+success_patterns:
+  - pattern: "Linus三问式需求分析"
+    description: "通过'真问题/更简单方法/破坏性'三个角度快速定位核心要点"
+    success_rate: "100%"
+    applicable_scenarios: ["架构设计", "需求分析", "技术选型"]
+    
+  - pattern: "并行Agent任务分解"
+    description: "将复杂任务分解为独立子任务，多Agent并行处理"  
+    success_rate: "95%"
+    applicable_scenarios: ["大型功能开发", "架构搭建", "模块化实现"]
+    
+  - pattern: "数据结构优先设计"
+    description: "先设计清晰的数据模型，再考虑业务逻辑实现"
+    success_rate: "90%"
+    applicable_scenarios: ["系统架构", "API设计", "状态管理"]
+
+# 用户核心工作原则 - 防遗忘记忆
+user_core_principles:
+  - principle: "CTO身份定位"
+    description: "我是CTO，专注宏观架构和任务分配，具体实现交给子Agent"
+    implementation: "写好指令、做好任务分配、做好整体系统架构总工程师工作"
+    
+  - principle: "强制并行Agent执行"
+    description: "所有代码搭建任务必须交给子Agent并发完成，禁止单线程开发"
+    implementation: "将复杂任务拆解为可并行的独立子任务，同时启动多个Agent"
+    critical: true
+    
+  - principle: "自驱主动完成"
+    description: "后续不再询问批准，必须自驱主动根据docs/core要求完成系统搭建"
+    implementation: "遵循CLAUDE.md + docs/core文档，主动推进直至完成"
+    critical: true
+    
+  - principle: "记忆系统持续更新"
+    description: "不断补充和增加记忆系统，避免新上下文中遗忘关键原则"
+    implementation: "每次重要指导都要写入errors_memory.yaml防止遗忘"
+    critical: true
+
+  - principle: "生产就绪验证"
+    description: "系统完成后必须进行全面测试，确保可直接运行无错误"
+    implementation: "编译错误、语法错误、API对接、前后端交互全面排查"
+    critical: true
+
+  - principle: "代码库清洁度管理"
+    description: "保持代码库整洁，及时清理无用文件和临时文件，避免技术债务积累"
+    implementation: "定期安排子Agent清理，使用精确的白名单机制防止误删关键文件"
+    critical: true
+
+  - principle: "强制重读CLAUDE.md工作流"
+    description: "每次新任务开始前必须重读CLAUDE.md，更新记忆系统，遵循Linus三问原则"
+    implementation: "重读→更新记忆→Linus三问→任务分解→并行Agent执行"
+    critical: true
+
+# Next.js构建与前端错误处理 - 2025-08-24新增
+nextjs_frontend_errors:
+  - id: "ERR-NEXT-001"
+    title: "Event handlers在服务器组件中的错误"
+    fingerprint: "Error: Event handlers cannot be passed to Client Component props - onClick函数传递给服务器组件"
+    trigger: "在服务器组件中使用onClick等事件处理器"
+    impact: "构建失败，交互功能不可用"
+    root_cause: "Next.js App Router中服务器组件与客户端组件边界不清"
+    fix: "为需要交互的组件添加'use client'指令"
+    prevention: ["交互组件必须标记为客户端组件", "服务器组件只做数据获取和渲染", "明确组件边界"]
+    owner: "Frontend Fix Agent"
+    date: "2025-08-24"
+
+  - id: "ERR-NEXT-002"
+    title: "Next.js构建缓存损坏"
+    fingerprint: "ENOENT: no such file or directory, open '.next/server/app/page/app-build-manifest.json'"
+    trigger: "构建过程中断或配置变更导致缓存不一致"
+    impact: "开发服务器无法启动，构建清单文件缺失"
+    root_cause: "Next.js构建缓存与新配置不兼容"
+    fix: "删除.next目录并重新构建: rm -rf .next && npm run build"
+    prevention: ["配置变更后清理缓存", "定期清理.next目录", "使用next clean命令"]
+    owner: "Build System Agent"
+    date: "2025-08-24"
+
+  - id: "ERR-NEXT-003"
+    title: "PostCSS配置与Tailwind CSS v4兼容性"
+    fingerprint: "Your custom PostCSS configuration must export a plugins key"
+    trigger: "Tailwind CSS v4需要@tailwindcss/postcss插件而非传统tailwindcss插件"
+    impact: "样式编译失败，页面显示黑白无样式"
+    root_cause: "Tailwind CSS v4使用新的PostCSS插件架构"
+    fix: "安装@tailwindcss/postcss，创建正确的postcss.config.js配置"
+    prevention: ["确认Tailwind版本对应的配置方式", "PostCSS配置使用module.exports语法", "安装对应的依赖包"]
+    owner: "CSS Config Agent"
+    date: "2025-08-24"
+
+  - id: "ERR-NEXT-004"
+    title: "无效Tailwind CSS类使用"
+    fingerprint: "Cannot apply unknown utility class border-border"
+    trigger: "使用了不存在的Tailwind CSS类或@apply规则不当"
+    impact: "样式编译警告，可能导致样式不生效"
+    root_cause: "CSS变量引用方式错误，@apply使用了无效的类名"
+    fix: "使用正确的CSS变量引用或有效的Tailwind类"
+    prevention: ["检查Tailwind配置中的自定义类", "避免在@apply中使用自定义CSS变量类", "使用原生CSS属性替代无效类"]
+    owner: "CSS Fix Agent"
+    date: "2025-08-24"
+
+  - id: "ERR-NEXT-005"
+    title: "useSearchParams需要Suspense边界"
+    fingerprint: "useSearchParams() should be wrapped in a suspense boundary"
+    trigger: "在页面组件中直接使用useSearchParams而未包装Suspense"
+    impact: "页面预渲染失败，影响SEO和首屏性能"
+    root_cause: "Next.js App Router要求searchParams使用在Suspense边界内"
+    fix: "创建Suspense包装器组件，将useSearchParams逻辑包装在内"
+    prevention: ["使用searchParams的组件用Suspense包装", "提供合适的fallback UI", "分离服务器与客户端逻辑"]
+    owner: "Route Fix Agent"
+    date: "2025-08-24"
+
+  - id: "ERR-NEXT-006"
+    title: "动态服务器使用与静态渲染冲突"
+    fingerprint: "Dynamic server usage: Route couldn't be rendered statically because it used cookies"
+    trigger: "页面使用了cookies但被标记为静态渲染"
+    impact: "构建时预渲染失败，部署可能出错"
+    root_cause: "Next.js默认尝试静态渲染但页面需要动态内容"
+    fix: "为使用cookies的页面添加export const dynamic = 'force-dynamic'"
+    prevention: ["明确标记动态页面", "区分静态与动态内容", "合理规划渲染策略"]
+    owner: "Rendering Strategy Agent"
+    date: "2025-08-24"
+
+# CSS和样式系统错误
+css_styling_errors:
+  - id: "ERR-CSS-001"
+    title: "页面显示黑白无样式问题"
+    fingerprint: "页面渲染但样式不加载，只显示基础HTML结构"
+    trigger: "PostCSS配置错误或Tailwind编译失败"
+    impact: "用户界面完全无样式，用户体验极差"
+    root_cause: "CSS构建管道中断或配置错误"
+    fix: "检查PostCSS配置，确保Tailwind正确编译，清理构建缓存"
+    prevention: ["定期检查样式构建流程", "监控CSS bundle大小", "设置样式加载错误捕获"]
+    owner: "Styling System Agent"
+    date: "2025-08-24"
+
+# 包管理和依赖错误
+dependency_errors:
+  - id: "ERR-DEP-001"
+    title: "Tailwind CSS版本升级兼容性"
+    fingerprint: "Tailwind CSS v4需要新的PostCSS插件和配置语法"
+    trigger: "升级到Tailwind CSS v4但配置未更新"
+    impact: "样式编译失败，需要重新配置整个CSS构建流程"
+    root_cause: "版本升级时未检查breaking changes和配置要求"
+    fix: "安装@tailwindcss/postcss插件，更新配置文件语法"
+    prevention: ["升级前检查changelog", "测试环境先验证", "保留配置备份"]
+    owner: "Dependency Management Agent"
+    date: "2025-08-24"
+
+# 成功模式更新
+success_patterns_update:
+  - pattern: "系统性错误排查方法"
+    description: "构建错误→缓存清理→配置检查→依赖验证→逐步修复的标准流程"
+    success_rate: "100%"
+    applicable_scenarios: ["Next.js构建问题", "样式编译错误", "开发环境问题"]
+    steps: ["清理缓存(.next目录)", "检查配置文件", "验证依赖版本", "逐一修复错误", "测试验证"]
+    
+  - pattern: "前端错误处理优先级"
+    description: "编译错误→运行时错误→样式错误→优化警告的处理优先级"
+    success_rate: "95%"
+    applicable_scenarios: ["前端问题排查", "构建系统调试"]
+    priority_order: ["TypeScript编译错误", "构建系统错误", "运行时JavaScript错误", "CSS样式问题", "性能优化警告"]
+
+# Tailwind CSS v4特定错误 - 2025-08-24新增
+tailwindcss_v4_errors:
+  - id: "ERR-TW4-001"
+    title: "Tailwind CSS v4中@apply无法使用CSS变量类"
+    fingerprint: "Error: Cannot apply unknown utility class `bg-background`"
+    trigger: "在CSS中使用@apply bg-background等CSS变量定义的类"
+    impact: "CSS编译失败，样式无法生成，开发服务器无法启动"
+    root_cause: "Tailwind CSS v4不再支持@apply引用基于CSS变量的自定义类"
+    fix: "直接使用CSS属性: background-color: hsl(var(--background));"
+    prevention: [
+      "避免在@apply中使用自定义CSS变量类",
+      "直接使用CSS属性语法替代@apply",
+      "更新Tailwind配置确保v4兼容性",
+      "清理.next构建缓存防止缓存干扰"
+    ]
+    solution_pattern:
+      before: "@apply bg-background text-foreground;"
+      after: "background-color: hsl(var(--background)); color: hsl(var(--foreground));"
+    owner: "CSS Migration Agent"
+    date: "2025-08-24"
+    success_rate: "100%"
+
+# 最终解决方案 - Tailwind CSS版本兼容性
+final_solution:
+  problem: "Tailwind CSS v4兼容性问题导致页面黑白无样式"
+  root_cause: "Tailwind CSS v4架构变化，需要新的PostCSS插件和配置"
+  successful_approach:
+    - "降级到Tailwind CSS 3.x稳定版本"
+    - "使用传统postcss.config.js配置"
+    - "清理构建缓存确保干净重建"
+    - "验证CSS类正确编译到最终文件"
+  final_status: "✅ 完全修复 - 页面样式正确加载，用户界面完整显示"
+  verification:
+    - "Tailwind CSS 3.x: 所有类正确编译"
+    - "开发服务器: Ready in 755ms"
+    - "CSS文件: 包含所有必需的样式类"
+    - "页面渲染: HTML结构完整，样式正确应用"

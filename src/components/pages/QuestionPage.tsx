@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { SimplePageContainer } from '../SimplePageContainer';
-import { ProgressBar } from '../ProgressBar';
+import React, { useState, useEffect } from 'react';
 import { Question } from '../../types/test';
+import { questionImages } from '../../data/questionImages';
 
 interface QuestionPageProps {
   question: Question;
@@ -10,6 +9,7 @@ interface QuestionPageProps {
   selectedOption?: number;
   onSelectOption: (optionId: number, scores: any) => void;
   onNext: () => void;
+  isCurrentPage?: boolean; // 新增：标识是否为当前页面
 }
 
 export const QuestionPage: React.FC<QuestionPageProps> = ({
@@ -18,228 +18,380 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   totalQuestions,
   selectedOption,
   onSelectOption,
-  onNext
+  onNext,
+  isCurrentPage = false
 }) => {
   const [selected, setSelected] = useState<number | null>(selectedOption || null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [encouragement, setEncouragement] = useState<string>('');
-  const [showEncouragement, setShowEncouragement] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isExiting, setIsExiting] = useState(false); // 新增：控制退出动画
 
-  // Encouragement messages based on question progress
-  const getEncouragement = useCallback((questionNum: number) => {
-    const messages = [
-      "Great start! Your creative mind is revealing itself... ✨",
-      "Interesting choice! The patterns are emerging... 🧬", 
-      "Your unique perspective is showing... 🎯",
-      "Halfway there! Your DNA signature is taking shape... 🌟",
-      "Excellent insights! The picture is getting clearer... 💫",
-      "Almost complete! Your creative profile is nearly ready... 🚀",
-      "Final stretch! Your DNA blueprint is forming... 🎨",
-      "Perfect! Analyzing your creative genetic code... 🧪"
-    ];
-    return messages[questionNum - 1] || messages[0];
-  }, []);
-
-  // Question categories for dynamic theming
-  const getQuestionCategory = useCallback((questionNum: number) => {
-    const categories = [
-      "Mindset", "Problem Solving", "Workflow", "Creativity",
-      "Collaboration", "Environment", "Learning", "Motivation"
-    ];
-    return categories[questionNum - 1] || "Creativity";
-  }, []);
-
-  // 当外部传入的selectedOption改变时，同步本地状态
+  // 页面动画控制 - 实现流畅的进入和退出
+  useEffect(() => {
+    if (isCurrentPage) {
+      // 成为当前页面时
+      setIsProcessing(false);
+      setIsExiting(false);
+      setIsVisible(false);
+      
+      // 立即开始入场动画，无延迟
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 100); // 最小延迟，保证状态更新完成
+      
+      return () => clearTimeout(timer);
+    } else {
+      // 不再是当前页面时，立即隐藏
+      setIsVisible(false);
+      setIsExiting(false);
+    }
+  }, [isCurrentPage]);
+  
+  // 单独处理selectedOption变化
   useEffect(() => {
     setSelected(selectedOption || null);
   }, [selectedOption]);
 
-  const handleOptionSelect = (optionId: number, scores: any, event?: React.MouseEvent) => {
+
+  const handleOptionSelect = (optionId: number, scores: any) => {
     if (isProcessing) return;
-    
-    // Get click position for particle effect
-    const rect = event?.currentTarget.getBoundingClientRect();
-    const x = rect ? ((event.clientX - rect.left) / rect.width) * 100 : 50;
-    const y = rect ? ((event.clientY - rect.top) / rect.height) * 100 : 50;
-    
-    // Set CSS custom properties for particle animation
-    if (event?.currentTarget) {
-      (event.currentTarget as HTMLElement).style.setProperty('--x', `${x}%`);
-      (event.currentTarget as HTMLElement).style.setProperty('--y', `${y}%`);
-    }
     
     const wasAlreadySelected = selected === optionId;
     setSelected(optionId);
     onSelectOption(optionId, scores);
     
     if (!wasAlreadySelected) {
-      setIsProcessing(true);
+      // 开始流畅的退出过程
+      setIsExiting(true);
       
-      // Show encouragement
-      const encouragementText = getEncouragement(questionNumber);
-      setEncouragement(encouragementText);
-      setShowEncouragement(true);
-      
-      setTimeout(() => {
-        setShowEncouragement(false);
-      }, 1000);
-      
-      // Move to next question
+      // 立即触发页面切换，让SwipePageContainer的动画接管
       setTimeout(() => {
         onNext();
-        setIsProcessing(false);
-      }, 1400);
+      }, 300); // 给退出动画足够时间
     }
   };
 
-  const questionCategory = getQuestionCategory(questionNumber);
   const progress = (questionNumber / totalQuestions) * 100;
 
+  // 解析问题文本，严格按照设计规格的精确字体层次
+  const formatQuestionText = (text: string) => {
+    // 问题 1: "Your :) ideal Saturday morning starts with..."
+    if (text.includes("ideal Saturday morning")) {
+      return {
+        line1: { text: "Your :) ideal", fontSize: "32px", fontWeight: 500 },
+        line2: { text: "Saturday", fontSize: "48px", fontWeight: 700 },
+        line3: { text: "morning", fontSize: "40px", fontWeight: 500 },
+        line4: { text: "starts with...", fontSize: "32px", fontWeight: 300 }
+      };
+    }
+    
+    // 问题 2: "Your laptop starts (=д=) overheating and running super slow..."
+    if (text.includes("laptop starts")) {
+      return {
+        line1: { text: "Your laptop", fontSize: "40px", fontWeight: 500 },
+        line2: { text: "starts (=д=)", fontSize: "32px", fontWeight: 500 },
+        line3: { text: "overheating", fontSize: "44px", fontWeight: 700 },
+        line4: { text: "and running", fontSize: "34px", fontWeight: 500 },
+        line5: { text: "super slow...", fontSize: "38px", fontWeight: 700 }
+      };
+    }
+    
+    // 问题 3: "Your phone's photo library is mostly filled with..."
+    if (text.includes("phone's photo library")) {
+      return {
+        line1: { text: "Your phone's", fontSize: "34px", fontWeight: 500 },
+        line2: { text: "photo", fontSize: "40px", fontWeight: 500 },
+        line3: { text: "library is", fontSize: "36px", fontWeight: 500 },
+        line4: { text: "mostly filled", fontSize: "40px", fontWeight: 700 },
+        line5: { text: "with...", fontSize: "36px", fontWeight: 500 }
+      };
+    }
+    
+    // 问题 4: "You see a cool DIY project online..."
+    if (text.includes("DIY project online")) {
+      return {
+        line1: { text: "You see a cool", fontSize: "34px", fontWeight: 500 },
+        line2: { text: "DIY project", fontSize: "42px", fontWeight: 700 },
+        line3: { text: "online...", fontSize: "38px", fontWeight: 500 }
+      };
+    }
+    
+    // 问题 5: "You're (ಠ.ಠ)ง assembling IKEA furniture..."
+    if (text.includes("assembling IKEA")) {
+      return {
+        line1: { text: "You're (ಠ.ಠ)ง", fontSize: "30px", fontWeight: 500 },
+        line2: { text: "assembling", fontSize: "38px", fontWeight: 700 },
+        line3: { text: "IKEA", fontSize: "44px", fontWeight: 700 },
+        line4: { text: "furniture...", fontSize: "36px", fontWeight: 500 }
+      };
+    }
+    
+    // 问题 6: "If you were a vlogger, you'd most want to share..."
+    if (text.includes("were a vlogger")) {
+      return {
+        line1: { text: "If you were a", fontSize: "32px", fontWeight: 500 },
+        line2: { text: "vlogger", fontSize: "42px", fontWeight: 700 },
+        line3: { text: "you'd most", fontSize: "30px", fontWeight: 500 },
+        line4: { text: "want to", fontSize: "36px", fontWeight: 500 },
+        line5: { text: "share...", fontSize: "40px", fontWeight: 700 }
+      };
+    }
+    
+    // 问题 7: "Your (^▽^) shopping style is..."
+    if (text.includes("shopping style")) {
+      return {
+        line1: { text: "Your (^▽^)", fontSize: "32px", fontWeight: 500 },
+        line2: { text: "shopping", fontSize: "40px", fontWeight: 700 },
+        line3: { text: "style is...", fontSize: "42px", fontWeight: 700 }
+      };
+    }
+    
+    // 问题 8: "You're stuck in an elevator for 30 minutes... (^_^)"
+    if (text.includes("stuck in an elevator")) {
+      return {
+        line1: { text: "You're stuck in", fontSize: "30px", fontWeight: 500 },
+        line2: { text: "an elevator", fontSize: "38px", fontWeight: 700 },
+        line3: { text: "for 30", fontSize: "42px", fontWeight: 700 },
+        line4: { text: "minutes...", fontSize: "36px", fontWeight: 500 },
+        line5: { text: "(^_^)", fontSize: "28px", fontWeight: 300 }
+      };
+    }
+    
+    // 默认处理
+    return {
+      line1: { text: text, fontSize: "40px", fontWeight: 500 }
+    };
+  };
+
+  const questionLines = formatQuestionText(question.text);
+
   return (
-    <SimplePageContainer className="justify-start pt-8 relative overflow-hidden">
-      {/* Dynamic Background Based on Progress */}
-      <div className="absolute inset-0 opacity-30">
-        <div 
-          className="absolute inset-0 transition-all duration-1000"
-          style={{
-            background: `radial-gradient(circle at ${20 + (progress * 0.6)}% ${30 + (progress * 0.4)}%, rgba(66, 153, 225, 0.1) 0%, transparent 50%)`
-          }}
-        ></div>
+    <div className={`h-screen w-full relative overflow-hidden bg-white transition-all duration-700 ${
+      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      {/* 顶部进度条 */}
+      <div className="absolute top-6 left-6 right-6 z-20">
+        <div className="w-full bg-gray-300 rounded-full" style={{ height: '6px', backgroundColor: '#E0E0E0' }}>
+          <div 
+            className="h-full transition-all duration-1000 ease-out rounded-full"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: '#FFD700'
+            }}
+          />
+        </div>
       </div>
 
-      <div className="w-full space-y-8 relative z-10">
-        {/* Enhanced Progress with 3D Effect */}
-        <div className="animate-fade-in">
-          <div className="progress-3d mb-4">
-            <div className="progress-track"></div>
+      {/* 右上角ASCII艺术背景 */}
+      <div 
+        className={`absolute top-16 right-0 z-0 transition-all duration-700 question-ascii-right ${
+          isVisible ? 'translate-x-0' : 'translate-x-8'
+        }`}
+        style={{ 
+          animationDelay: '0.3s',
+          width: '40%'
+        }}
+      >
+        <img 
+          src={(questionImages[questionNumber]?.right) || "/ascii-right.png"}
+          alt="ASCII Background" 
+          className="w-full h-auto object-contain deco-yellow"
+        />
+      </div>
+
+      {/* 左下角黄色ASCII艺术装饰 */}
+      <div 
+        className={`absolute bottom-80 left-0 z-0 transition-all duration-700 question-ascii-left ${
+          isVisible ? 'translate-y-0' : 'translate-y-8'
+        }`}
+        style={{ 
+          animationDelay: '0.5s',
+          width: '35%',
+          
+        }}
+      >
+        <img 
+          src={(questionImages[questionNumber]?.left) || "/ascii-left.png"}
+          alt="ASCII Decoration" 
+          className="w-full h-auto object-contain deco-black"
+        />
+      </div>
+
+      {/* 主内容区域 */}
+      <div className="relative z-10 px-6">
+        {/* 问题标题 */}
+        <div className="mt-16 mb-12">
+          {questionLines.line1 && (
             <div 
-              className="progress-fill-3d"
-              style={{ width: `${progress}%` }}
-            >
-              <div className="progress-orb"></div>
-            </div>
-          </div>
-          <div className="flex justify-between text-sm text-white/70">
-            <span className="font-medium">{questionCategory}</span>
-            <span>Question {questionNumber} of {totalQuestions}</span>
-          </div>
-        </div>
-
-        {/* Enhanced Question Card */}
-        <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="glass-morphism p-6 rounded-2xl">
-            <div className="text-center space-y-4">
-              <div className="inline-block px-3 py-1 bg-blue-500/20 rounded-full text-xs font-medium text-blue-300 mb-2">
-                {questionCategory} • {questionNumber}/{totalQuestions}
-              </div>
-              <h2 className="text-2xl font-bold leading-tight text-white">
-                {question.text}
-              </h2>
-            </div>
-          </div>
-
-          {/* Enhanced Options with Better UX */}
-          <div className="space-y-4">
-            {question.options.map((option, index) => (
-              <button
-                key={option.id}
-                onClick={(e) => handleOptionSelect(option.id, option.scores, e)}
-                disabled={isProcessing}
-                className={`option-button animate-fade-in group ${
-                  selected === option.id ? 'selected' : ''
-                } ${isProcessing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
-                style={{ animationDelay: `${0.4 + index * 0.15}s` }}
-              >
-                <div className="flex items-center space-x-4">
-                  {/* Enhanced Radio Button */}
-                  <div className="relative">
-                    <div className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${
-                      selected === option.id 
-                        ? 'border-white bg-gradient-to-r from-blue-400 to-purple-500' 
-                        : 'border-white/40 group-hover:border-white/60'
-                    }`}>
-                      {selected === option.id && (
-                        <div className="w-2 h-2 bg-white rounded-full mx-auto mt-1.5 animate-scale-in"></div>
-                      )}
-                    </div>
-                    {selected === option.id && (
-                      <div className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-30"></div>
-                    )}
-                  </div>
-                  
-                  {/* Option Content */}
-                  <div className="flex-1 text-left">
-                    <div className="font-medium text-white group-hover:text-white/90 transition-colors">
-                      {option.text}
-                    </div>
-                  </div>
-                  
-                  {/* Arrow Indicator */}
-                  <div className={`transition-all duration-300 ${
-                    selected === option.id 
-                      ? 'transform translate-x-1 opacity-100' 
-                      : 'opacity-0 group-hover:opacity-50'
-                  }`}>
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Enhanced Processing State */}
-        {isProcessing && (
-          <div className="pt-6 animate-fade-in text-center space-y-4">
-            {/* Encouragement Message */}
-            {showEncouragement && (
-              <div className="glass-morphism px-6 py-3 rounded-xl animate-scale-in">
-                <p className="text-white font-medium">{encouragement}</p>
-              </div>
-            )}
-            
-            {/* Loading Animation */}
-            <div className="flex items-center justify-center space-x-2">
-              <div className="flex space-x-1">
-                {[...Array(3)].map((_, i) => (
-                  <div 
-                    key={i}
-                    className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-pulse"
-                    style={{ animationDelay: `${i * 0.2}s` }}
-                  ></div>
-                ))}
-              </div>
-            </div>
-            
-            <p className="text-sm text-white/60 mt-2">
-              {questionNumber === totalQuestions 
-                ? '🧬 Analyzing your creative DNA...' 
-                : '✨ Processing your choice...'
-              }
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Question Progress Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-        <div className="flex space-x-2">
-          {[...Array(totalQuestions)].map((_, i) => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i < questionNumber 
-                  ? 'bg-gradient-to-r from-green-400 to-blue-500 scale-110' 
-                  : i === questionNumber - 1 
-                    ? 'bg-gradient-to-r from-blue-400 to-purple-500 scale-125 shadow-lg' 
-                    : 'bg-white/20'
+              className={`text-black transition-all duration-500 ${
+                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
-            />
+              style={{ 
+                animationDelay: '0.2s',
+                fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line1.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '6px'
+              }}
+            >
+              {questionLines.line1.text}
+            </div>
+          )}
+          {questionLines.line2 && (
+            <div 
+              className={`text-black transition-all duration-500 ${
+                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+              }`}
+              style={{ 
+                animationDelay: '0.3s',
+                fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line2.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '6px'
+              }}
+            >
+              {questionLines.line2.text}
+            </div>
+          )}
+          {questionLines.line3 && (
+            <div 
+              className={`text-black transition-all duration-500 ${
+                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+              }`}
+              style={{ 
+                animationDelay: '0.4s',
+                fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line3.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '6px'
+              }}
+            >
+              {questionLines.line3.text}
+            </div>
+          )}
+          {questionLines.line4 && (
+            <div 
+              className={`text-black transition-all duration-500 ${
+                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+              }`}
+              style={{ 
+                animationDelay: '0.5s',
+                fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line4.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: questionLines.line5 ? '6px' : '0px'
+              }}
+            >
+              {questionLines.line4.text}
+            </div>
+          )}
+          {questionLines.line5 && (
+            <div 
+              className={`text-black transition-all duration-500 ${
+                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+              }`}
+              style={{ 
+                animationDelay: '0.6s',
+                fontSize: `calc(${questionLines.line5.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line5.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '0px'
+              }}
+            >
+              {questionLines.line5.text}
+            </div>
+          )}
+        </div>
+
+        {/* 选项按钮布局 */}
+        <div className="space-y-3 mb-8 mx-auto mt-6" style={{ maxWidth: '340px' }}>
+          {question.options.map((option, index) => (
+            <button
+              key={option.id}
+              onClick={() => handleOptionSelect(option.id, option.scores)}
+              disabled={isProcessing}
+              className={`w-full text-left flex items-center elegant-hover ${
+                selected === option.id ? 'selected-highlight' : ''
+              } ${
+                isProcessing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
+              } ${
+                isVisible ? 'opacity-100 translate-y-0' : 
+                isExiting ? 'opacity-0 translate-x-8' : 'opacity-0 translate-y-4'
+              }`}
+              style={{ 
+                animationDelay: `${0.7 + index * 0.1}s`,
+                borderRadius: 'calc(16px * var(--responsive-scale))',
+                height: 'calc(64px * var(--responsive-scale))',
+                backgroundColor: selected === option.id ? '#FFD700' : '#F5F5F5',
+                paddingLeft: '20px',
+                paddingRight: '20px',
+                minHeight: 'calc(44px * var(--responsive-scale))'
+              }}
+            >
+              {/* 左侧圆点指示器 */}
+              <div 
+                className="rounded-full flex-shrink-0 transition-all duration-300"
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  backgroundColor: selected === option.id ? '#000000' : '#CCCCCC',
+                  marginRight: '16px'
+                }}
+              />
+              
+              {/* 选项文字 */}
+              <span 
+                className="transition-all duration-300"
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  color: selected === option.id ? '#000000' : '#333333',
+                  lineHeight: '1.4'
+                }}
+              >
+                {option.text}
+              </span>
+            </button>
           ))}
         </div>
       </div>
-    </SimplePageContainer>
+
+      {/* 底部品牌标识 */}
+      <div className={`absolute left-1/2 transform -translate-x-1/2 z-10 transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`} 
+      style={{ 
+        bottom: 'calc(40px + env(safe-area-inset-bottom))',
+        animationDelay: '0.8s'
+      }}>
+        <p 
+          style={{
+            fontSize: '14px',
+            color: '#999999',
+            fontWeight: 400
+          }}
+        >
+          Powered by HOTO
+        </p>
+      </div>
+
+      {/* 底部导航指示条 */}
+      <div className={`absolute left-1/2 transform -translate-x-1/2 bg-black z-10 transition-all duration-700 ${
+        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+      }`} 
+      style={{ 
+        bottom: 'calc(12px + env(safe-area-inset-bottom))',
+        width: '134px',
+        height: '5px',
+        borderRadius: '2.5px',
+        animationDelay: '0.9s'
+      }} />
+
+    </div>
   );
 };

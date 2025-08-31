@@ -1,0 +1,26 @@
+{
+    "env": {
+      "ANTHROPIC_AUTH_TOKEN": "sk-Azo1wGZST91700iZV5CUTFtTpNOb6LIZdUyDJNuU0sG0iu6w",
+      "ANTHROPIC_BASE_URL": "https://api.moonshot.cn/anthropic",
+      "ANTHROPIC_MODEL": "kimi-k2-turbo-preview"
+    },
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(conda activate:*)",
+      "Bash(source:*)",
+      "Bash(pytest:*)",
+      "mcp__zen__chat",
+      "Bash(jq length:*)"
+    ],
+    "deny": []
+  },
+ 
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "zen"
+  ]
+}

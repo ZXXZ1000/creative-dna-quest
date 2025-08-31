@@ -1,0 +1,28 @@
+{
+    "env": {
+      "ANTHROPIC_CUSTOM_HEADERS": "x-api-key:123",
+      "ANTHROPIC_BASE_URL": "https://claude-worker-proxy.zx19970301.workers.dev/openai/https://nivqtnkndymj.ap-southeast-1.clawcloudrun.com/",
+      "ANTHROPIC_MODEL": "gemini-2.5-pro", 
+      "ANTHROPIC_SMALL_FAST_MODEL": "gemini-2.5-flash", 
+      "API_TIMEOUT_MS": "600000"
+    },
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(conda activate:*)",
+      "Bash(source:*)",
+      "Bash(pytest:*)",
+      "mcp__zen__chat",
+      "Bash(jq length:*)"
+    ],
+    "deny": []
+  },
+ 
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "zen"
+  ]
+}

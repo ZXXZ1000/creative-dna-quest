@@ -26,6 +26,8 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
       newErrors.name = 'Name is required';
     } else if (name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters';
+    } else if (name.trim().length > 20) {
+      newErrors.name = 'Name must be at most 20 characters';
     }
 
     if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -82,17 +84,23 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
           {/* Name Input */}
           <div>
             <label className="block text-sm font-medium mb-2">Your Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              className={`w-full px-4 py-3 rounded-xl border-2 bg-input transition-all
-                ${errors.name 
-                  ? 'border-destructive focus:border-destructive' 
-                  : 'border-input-border focus:border-input-focus'
-                } focus:outline-none`}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                maxLength={20}
+                className={`w-full px-4 py-3 rounded-xl border-2 bg-input transition-all
+                  ${errors.name 
+                    ? 'border-destructive focus:border-destructive' 
+                    : 'border-input-border focus:border-input-focus'
+                  } focus:outline-none`}
+              />
+              <div className="absolute right-3 bottom-3 text-xs text-muted-foreground">
+                {name.length}/20
+              </div>
+            </div>
             {errors.name && (
               <p className="text-destructive text-sm mt-1">{errors.name}</p>
             )}
