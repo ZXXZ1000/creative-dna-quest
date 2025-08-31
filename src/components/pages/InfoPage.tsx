@@ -80,7 +80,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
           {/* 标题居中 */}
           <div className="text-center">
             <h2 className="text-2xl font-bold text-black">Almost Done!</h2>
-            <p className="text-gray-600">
+            <p className="text-gray-700">
               Tell us a bit about yourself to get your personalized results
             </p>
           </div>
@@ -90,7 +90,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
         <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
           {/* Name Input */}
           <div>
-            <label className="block text-sm font-medium mb-2">Your Name</label>
+            <label className="block text-sm font-medium mb-2 text-gray-800">Your Name</label>
             <div className="relative">
               <input
                 type="text"
@@ -104,7 +104,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
                     : 'border-gray-200 focus:border-yellow-400'
                   } focus:outline-none`}
               />
-              <div className="absolute right-3 bottom-3 text-xs text-gray-500">
+              <div className="absolute right-3 bottom-3 text-xs text-gray-700">
                 {name.length}/20
               </div>
             </div>
@@ -115,7 +115,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
 
           {/* Email Input */}
           <div>
-            <label className="block text-sm font-medium mb-2">Email Address (Optional)</label>
+            <label className="block text-sm font-medium mb-2 text-gray-800">Email Address (Optional)</label>
             <input
               type="email"
               value={email}
@@ -130,14 +130,14 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-700 mt-1">
               We'll send you your results and creative tips
             </p>
           </div>
 
           {/* Region Select */}
           <div>
-            <label className="block text-sm font-medium mb-2">Country/Region</label>
+            <label className="block text-sm font-medium mb-2 text-gray-800">Country/Region</label>
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
@@ -148,7 +148,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
                 } focus:outline-none`}
               style={{ color: region ? '#111827' : '#6B7280' }}
             >
-              <option value="" className="text-gray-500">Select Country/Region</option>
+              <option value="" className="text-gray-600">Select Country/Region</option>
               {regions.map(r => (
                 <option key={r} value={r} className="text-gray-900">{r}</option>
               ))}
@@ -168,11 +168,11 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
               className="mt-0.5 w-4 h-4 text-yellow-400 border-2 border-gray-300 rounded focus:ring-0 flex-shrink-0"
             />
             <div className="flex-1">
-              <label htmlFor="email-subscription" className="text-sm font-medium cursor-pointer">
+              <label htmlFor="email-subscription" className="text-sm font-medium cursor-pointer text-gray-800">
                 Get product updates and creative tips
               </label>
               <p className="text-xs text-gray-500 mt-1">
-                Receive occasional emails about new HOTO products and creative inspiration. Unsubscribe anytime.
+                
               </p>
             </div>
           </div>
@@ -195,7 +195,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
               <div className="text-center space-y-4">
                 <div className="text-4xl">🎁</div>
                 <h3 className="text-lg font-semibold">Don't miss out!</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-700">
                   Add your email to receive your personalized Creative DNA results and future creative inspiration!
                 </p>
                 <div className="space-y-3 pt-2">
