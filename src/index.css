@@ -1538,6 +1538,42 @@
     opacity: 0;
   }
 
+  /* HOTO Logo 字母跳动动画 - 优雅微妙的效果 */
+  @keyframes letter-gentle-bounce {
+    0%, 70%, 100% { 
+      transform: translateY(0); 
+    }
+    20% { 
+      transform: translateY(-3px); 
+    }
+    40% { 
+      transform: translateY(-1px); 
+    }
+  }
+
+  /* 为每个字母设置不同的延迟时间，形成从左到右的波浪效果 */
+  .hoto-letter {
+    display: inline-block;
+    animation: letter-gentle-bounce 3s ease-in-out infinite;
+    text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.15), 1px 2px 3px rgba(0, 0, 0, 0.12);
+  }
+
+  .hoto-letter-h {
+    animation-delay: 0s;
+  }
+
+  .hoto-letter-o1 {
+    animation-delay: 0.2s;
+  }
+
+  .hoto-letter-t {
+    animation-delay: 0.4s;
+  }
+
+  .hoto-letter-o2 {
+    animation-delay: 0.6s;
+  }
+
   /* 优雅的按钮悬停效果 */
   .elegant-hover {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

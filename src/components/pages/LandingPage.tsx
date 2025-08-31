@@ -115,7 +115,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         top: 'calc(8rem * var(--responsive-scale))',
         left: 'calc(1rem * var(--responsive-scale))'
       }}>
-        <h1 className="text-black r-text-4xl font-black tracking-tight animate-fade-in">HOTO</h1>
+        <h1 className="text-black r-text-4xl font-black tracking-tight animate-fade-in">
+          <span className="hoto-letter hoto-letter-h">H</span>
+          <span className="hoto-letter hoto-letter-o1">O</span>
+          <span className="hoto-letter hoto-letter-t">T</span>
+          <span className="hoto-letter hoto-letter-o2">O</span>
+        </h1>
       </div>
 
       {/* Main Content Area */}
@@ -173,10 +178,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               alertDiv.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50';
               alertDiv.innerHTML = `
                 <div class="bg-white p-6 rounded-lg max-w-sm mx-4 text-center animate-scale-in">
-                  <h3 class="text-lg font-bold mb-4 text-black">⚠️ 提示</h3>
-                  <p class="text-gray-700 mb-6">请先勾选协议后再开始测试。</p>
+                  <h3 class="text-lg font-bold mb-4 text-black">⚠️ Notice</h3>
+                  <p class="text-gray-700 mb-6">Please check the agreement before starting the test.</p>
                   <button class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors" onclick="this.parentElement.parentElement.remove()">
-                    知道了
+                    Got it
                   </button>
                 </div>
               `;
@@ -269,7 +274,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 )}
               </div>
             </div>
-            <span className="text-gray-600 r-text-sm">选择协议</span>
+            <span className="text-gray-600 r-text-sm">Agree to terms</span>
           </label>
         </div>
       </div>
@@ -297,7 +302,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               paddingBottom: 'calc(1.5rem * var(--responsive-scale))',
               height: 'calc(5rem * var(--responsive-scale))'
             }}>
-              <h2 className="r-text-4xl font-black text-black tracking-tight">HOTO</h2>
+              <h2 className="r-text-4xl font-black text-black tracking-tight">
+                <span className="hoto-letter hoto-letter-h">H</span>
+                <span className="hoto-letter hoto-letter-o1">O</span>
+                <span className="hoto-letter hoto-letter-t">T</span>
+                <span className="hoto-letter hoto-letter-o2">O</span>
+              </h2>
               {/* Folder tab label in top right - like file folder */}
               <div className="absolute top-0" style={{
                 right: 'calc(3rem * var(--responsive-scale))'
