@@ -64,10 +64,23 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
       // 开始流畅的退出过程
       setIsExiting(true);
       
-      // 立即触发页面切换，让SwipePageContainer的动画接管
+      // 根据动画复杂度调整延迟时间，让退出动画与主题动画协调
+      const exitDelayMap = {
+        1: 600,  // 跳动浮现 - 需要更多时间
+        2: 500,  // 左右交叉 - 中等时间
+        3: 700,  // 螺旋渐现 - 最复杂，需要最多时间
+        4: 650,  // 弹性波动 - 较多时间
+        5: 600,  // 缩放绽放 - 需要更多时间
+        6: 550,  // 旋转渐现 - 中等时间
+        7: 450,  // 打字机效果 - 相对简单
+        8: 700   // 流体流动 - 复杂，需要更多时间
+      };
+      
+      const exitDelay = exitDelayMap[questionNumber as keyof typeof exitDelayMap] || 500;
+      
       setTimeout(() => {
         onNext();
-      }, 300); // 给退出动画足够时间
+      }, exitDelay);
     }
   };
 
@@ -165,6 +178,101 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
   const questionLines = formatQuestionText(question.text);
 
+  // 根据问题编号获取动画主题
+  const getAnimationTheme = (questionNum: number) => {
+    const themes = {
+      1: {
+        textAnimation: 'animate-bounce-float-in',
+        optionAnimation: 'animate-option-float-in',
+        name: '优雅跳动浮现'
+      },
+      2: {
+        textAnimation: 'animate-slide-cross',
+        optionAnimation: 'animate-option-slide',
+        name: '左右交叉滑入'
+      },
+      3: {
+        textAnimation: 'animate-spiral-fade-in',
+        optionAnimation: 'animate-option-rotate-in',
+        name: '螺旋渐现'
+      },
+      4: {
+        textAnimation: 'animate-elastic-wave-in',
+        optionAnimation: 'animate-option-wave-in',
+        name: '弹性波动'
+      },
+      5: {
+        textAnimation: 'animate-scale-bloom-in',
+        optionAnimation: 'animate-option-scale-in',
+        name: '缩放绽放'
+      },
+      6: {
+        textAnimation: 'animate-rotation-fade-in',
+        optionAnimation: 'animate-option-flip-in',
+        name: '旋转渐现'
+      },
+      7: {
+        textAnimation: 'animate-typewriter-in',
+        optionAnimation: 'animate-option-type-in',
+        name: '打字机效果'
+      },
+      8: {
+        textAnimation: 'animate-liquid-flow-in',
+        optionAnimation: 'animate-option-flow-in',
+        name: '流体流动'
+      }
+    };
+    
+    return themes[questionNum as keyof typeof themes] || themes[1];
+  };
+
+  // 为问题2的左右交叉效果提供特殊处理
+  const getTextAnimationClass = (lineIndex: number) => {
+    const theme = getAnimationTheme(questionNumber);
+    
+    if (questionNumber === 2) {
+      // 左右交叉：奇数行从左进入，偶数行从右进入
+      return lineIndex % 2 === 0 ? 'animate-slide-cross-left' : 'animate-slide-cross-right';
+    }
+    
+    return theme.textAnimation;
+  };
+
+  // 为问题2的选项按钮提供交替滑入效果
+  const getOptionAnimationClass = (optionIndex: number) => {
+    const theme = getAnimationTheme(questionNumber);
+    
+    if (questionNumber === 2) {
+      // 选项交替滑入
+      return optionIndex % 2 === 0 ? 'animate-option-slide-left' : 'animate-option-slide-right';
+    }
+    
+    return theme.optionAnimation;
+  };
+
+  // 调整动画延迟时间，按75%设定让节奏更合适
+  const getAnimationDelay = (index: number, type: 'text' | 'option' | 'image') => {
+    const baseDelay = type === 'text' ? 0.45 : type === 'option' ? 2.1 : 0.2; // 图片从0.2s开始
+    const increment = type === 'text' ? 0.3 : type === 'option' ? 0.19 : 0.1; // 图片间隔0.1s
+    return `${baseDelay + index * increment}s`;
+  };
+
+  // 获取图片动画类型
+  const getImageAnimationClass = (position: 'left' | 'right', questionNum: number) => {
+    // 根据问题编号和位置决定动画类型
+    const animationMap: Record<number, { left: string; right: string }> = {
+      2: { left: 'animate-image-float-left', right: 'animate-image-slide-right' },
+      3: { left: 'animate-image-spiral', right: 'animate-image-elastic' },
+      4: { left: 'animate-image-elastic', right: 'animate-image-spiral' },
+      5: { left: 'animate-image-slide-right', right: 'animate-image-float-left' },
+      6: { left: 'animate-image-float-left', right: 'animate-image-slide-right' },
+      7: { left: 'animate-image-spiral', right: 'animate-image-elastic' },
+      8: { left: 'animate-image-elastic', right: 'animate-image-spiral' }
+    };
+    
+    return animationMap[questionNum]?.[position] || 'animate-image-float-left';
+  };
+
   return (
     <div className={`h-screen w-full relative overflow-hidden bg-white transition-all duration-700 ${
       isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -184,11 +292,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
       {/* 右上角ASCII艺术背景 */}
       <div 
-        className={`absolute top-16 right-0 z-0 transition-all duration-700 question-ascii-right ${
-          isVisible ? 'translate-x-0' : 'translate-x-8'
+        className={`absolute top-16 right-0 z-0 question-ascii-right ${
+          isVisible ? getImageAnimationClass('right', questionNumber) : 'opacity-0 translate-x-8'
         }`}
         style={{ 
-          animationDelay: '0.3s',
+          animationDelay: getAnimationDelay(0, 'image'),
           width: '40%'
         }}
       >
@@ -201,13 +309,12 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
       {/* 左下角黄色ASCII艺术装饰 */}
       <div 
-        className={`absolute bottom-80 left-0 z-0 transition-all duration-700 question-ascii-left ${
-          isVisible ? 'translate-y-0' : 'translate-y-8'
+        className={`absolute bottom-80 left-0 z-0 question-ascii-left ${
+          isVisible ? getImageAnimationClass('left', questionNumber) : 'opacity-0 translate-y-8'
         }`}
         style={{ 
-          animationDelay: '0.5s',
-          width: '35%',
-          
+          animationDelay: getAnimationDelay(1, 'image'),
+          width: '35%'
         }}
       >
         <img 
@@ -224,11 +331,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           {questionLines.line1 && (
             <div 
               className={`text-black transition-all duration-500 ${
-                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isVisible ? `${getTextAnimationClass(0)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
               style={{ 
-                animationDelay: '0.2s',
+                animationDelay: getAnimationDelay(0, 'text'),
                 fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
                 fontWeight: questionLines.line1.fontWeight,
                 lineHeight: '1.3',
@@ -241,11 +348,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           {questionLines.line2 && (
             <div 
               className={`text-black transition-all duration-500 ${
-                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isVisible ? `${getTextAnimationClass(1)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
               style={{ 
-                animationDelay: '0.3s',
+                animationDelay: getAnimationDelay(1, 'text'),
                 fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
                 fontWeight: questionLines.line2.fontWeight,
                 lineHeight: '1.3',
@@ -258,11 +365,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           {questionLines.line3 && (
             <div 
               className={`text-black transition-all duration-500 ${
-                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isVisible ? `${getTextAnimationClass(2)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
               style={{ 
-                animationDelay: '0.4s',
+                animationDelay: getAnimationDelay(2, 'text'),
                 fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
                 fontWeight: questionLines.line3.fontWeight,
                 lineHeight: '1.3',
@@ -275,11 +382,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           {questionLines.line4 && (
             <div 
               className={`text-black transition-all duration-500 ${
-                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isVisible ? `${getTextAnimationClass(3)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
               style={{ 
-                animationDelay: '0.5s',
+                animationDelay: getAnimationDelay(3, 'text'),
                 fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
                 fontWeight: questionLines.line4.fontWeight,
                 lineHeight: '1.3',
@@ -292,11 +399,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           {questionLines.line5 && (
             <div 
               className={`text-black transition-all duration-500 ${
-                isVisible ? 'opacity-100 translate-y-0 animate-bounce-in' : 
+                isVisible ? `${getTextAnimationClass(4)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
               style={{ 
-                animationDelay: '0.6s',
+                animationDelay: getAnimationDelay(4, 'text'),
                 fontSize: `calc(${questionLines.line5.fontSize} * var(--responsive-scale))`,
                 fontWeight: questionLines.line5.fontWeight,
                 lineHeight: '1.3',
@@ -320,11 +427,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
               } ${
                 isProcessing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
               } ${
-                isVisible ? 'opacity-100 translate-y-0' : 
+                isVisible ? `${getOptionAnimationClass(index)}` : 
                 isExiting ? 'opacity-0 translate-x-8' : 'opacity-0 translate-y-4'
               }`}
               style={{ 
-                animationDelay: `${0.7 + index * 0.1}s`,
+                animationDelay: getAnimationDelay(index, 'option'),
                 borderRadius: 'calc(16px * var(--responsive-scale))',
                 height: 'calc(64px * var(--responsive-scale))',
                 backgroundColor: selected === option.id ? '#FFD700' : '#F5F5F5',
