@@ -11,7 +11,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
   return (
     <div className="h-screen w-full relative overflow-hidden" style={{ 
-      backgroundColor: '#f8f8f8'
+      backgroundColor: '#ECECEC'
     }}>
       {/* Bottom-layer Background Image */}
       <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
@@ -73,22 +73,56 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         paddingLeft: 'calc(1.5rem * var(--responsive-scale))',
         paddingRight: 'calc(1.5rem * var(--responsive-scale))',
         marginTop: 'calc(12rem * var(--responsive-scale))',
-        gap: 'calc(2rem * var(--responsive-scale))',
+        gap: 'calc(0.5rem * var(--responsive-scale))',
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Main Title removed per new design */}
+        {/* Creative Philosophy Quotes */}
+        <div className="text-center space-y-1 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="grid grid-cols-1 gap-1 max-w-xs mx-auto">
+            <div className="text-left">
+              <p className="text-gray-500 italic" style={{ 
+                fontFamily: 'RM Neue, sans-serif',
+                fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)'
+              }}>
+                Some tinker endlessly.<br />
+                Others design first.
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-gray-500 italic" style={{ 
+                fontFamily: 'RM Neue, sans-serif',
+                fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)'
+              }}>
+                Some crave order.<br />
+                Others thrive in chaos.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Title */}
+        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s', marginTop: '1vh' }}>
+          <h1 className="text-black font-bold leading-tight" style={{
+            fontSize: 'clamp(2.8rem, 10vw, 4.2rem)',
+            fontFamily: 'RM Neue, sans-serif',
+            fontStyle: 'italic'
+          }}>
+            What's Your<br />
+            Creative Gene?
+          </h1>
+        </div>
         
         {/* Subtitle */}
-        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s', marginTop: '20vh' }}>
-          <div className="text-gray-600 r-text-lg leading-relaxed font-rm" style={{
+        <div className="text-center animate-fade-in" style={{ animationDelay: '0.7s', marginTop: '0.5vh' }}>
+          <p className="text-gray-600 leading-relaxed" style={{
+            fontSize: 'clamp(1.25rem, 4.5vw, 1.4rem)',
+            fontFamily: 'RM Neue, sans-serif',
             paddingLeft: 'calc(0.5rem * var(--responsive-scale))',
             paddingRight: 'calc(0.5rem * var(--responsive-scale))'
           }}>
-            <span className="block" style={{ whiteSpace: 'nowrap' }}>What drives your creativity? Are you a</span>
-            <span className="block" style={{ whiteSpace: 'nowrap' }}>systematic organizer, a visionary innovator, or</span>
-            <span className="block" style={{ whiteSpace: 'nowrap' }}>something entirely different?</span>
-          </div>
+            Like DNA, creativity comes in unique types.
+          </p>
         </div>
         
       </div>
@@ -98,7 +132,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         bottom: 'calc(8rem * var(--responsive-scale) + env(safe-area-inset-bottom))',
         animationDelay: '1.2s' 
       }}>
-        <button 
+        <img 
+          src="/start-test-button.png"
+          alt="START TEST"
           onClick={() => {
             if (!agreementChecked) {
               // Show custom alert modal instead of browser alert
@@ -123,33 +159,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             }
             onStart();
           }}
-          className={`landing-start-btn relative text-black font-bold transform -skew-x-12 transition-all duration-200 ease-out hover:scale-105 active:scale-95 ${
+          className={`landing-start-btn transition-all duration-200 ease-out hover:scale-105 active:scale-95 ${
             agreementChecked 
-              ? 'bg-yellow-400 hover:bg-yellow-500 cursor-pointer' 
-              : 'bg-gray-300 cursor-not-allowed'
+              ? 'cursor-pointer' 
+              : 'cursor-not-allowed opacity-50'
           }`}
           style={{ 
-            boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+            transform: 'scale(1.5)',
+            filter: agreementChecked ? 'none' : 'grayscale(100%)'
           }}
-        >
-          <span className="transform skew-x-12 block font-rm">START TEST</span>
-          <div 
-            className="absolute -right-2 top-1/2 transform -translate-y-1/2"
-            style={{
-              width: 0,
-              height: 0,
-              borderLeftStyle: 'solid',
-              borderLeftColor: agreementChecked ? '#FACC15' : '#D1D5DB', // yellow-400 or gray-300
-              borderTopStyle: 'solid',
-              borderBottomStyle: 'solid',
-              borderTopColor: 'transparent',
-              borderBottomColor: 'transparent',
-              borderLeftWidth: 'clamp(6px, calc(8px * var(--responsive-scale)), 10px)',
-              borderTopWidth: 'clamp(6px, calc(8px * var(--responsive-scale)), 10px)',
-              borderBottomWidth: 'clamp(6px, calc(8px * var(--responsive-scale)), 10px)'
-            }}
-          />
-        </button>
+        />
       </div>
       
       {/* Test Info */}
