@@ -335,7 +335,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
               <div className="font-bold text-lg">{result.title}</div>
               <div className="text-sm opacity-90 mt-1">@{userName} {regionEmoji}</div>
               <Logo 
-                src="/dist/logo.jpg" 
+                src="/assets/logos/logo.jpg" 
                 alt="HOTO Logo" 
                 className="mx-auto mt-2"
                 height={12}
@@ -422,7 +422,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
             <span className="inline-flex items-center gap-1">
               Thank you for exploring your Creative DNA with 
               <Logo 
-                src="/dist/logo.jpg" 
+                src="/assets/logos/logo.jpg" 
                 alt="HOTO Logo" 
                 className="inline-block"
                 height={6}

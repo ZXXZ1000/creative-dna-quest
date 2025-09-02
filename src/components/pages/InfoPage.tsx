@@ -71,7 +71,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
         <div className="space-y-2 animate-scale-in">
           {/* HOTO Logo - 左上角定位（替换文字为图片组件） */}
           <div className="mb-8 text-left">
-            <Logo src="/dist/logo.jpg" alt="HOTO Logo" height={24} />
+            <Logo src="/assets/logos/logo.jpg" alt="HOTO Logo" height={24} />
           </div>
           {/* 标题居中 */}
           <div className="text-center">

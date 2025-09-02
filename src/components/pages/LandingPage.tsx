@@ -61,7 +61,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       }}>
         {/* Use transparent-processed logo */}
         <Logo
-          src="/dist/logo.jpg"
+          src="/assets/logos/logo.jpg"
           alt="HOTO Logo"
           className="animate-fade-in"
           height={'calc(1.5rem * var(--responsive-scale))'}
@@ -231,7 +231,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               height: 'calc(5rem * var(--responsive-scale))'
             }}>
               <Logo
-                src="/dist/logo.jpg"
+                src="/assets/logos/logo.jpg"
                 alt="HOTO Logo"
                 height={'calc(1.25rem * var(--responsive-scale))'}
               />
