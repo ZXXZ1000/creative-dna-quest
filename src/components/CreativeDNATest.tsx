@@ -108,29 +108,19 @@ export const CreativeDNATest: React.FC = () => {
     return pages;
   }, [state.answers, state.userInfo, state.result, state.currentPage]);
 
-  // 页面切换处理
+  // 页面切换处理 - 禁止回退
   const handlePageChange = (newIndex: number) => {
     const newPageNumber = newIndex + 1;
-    if (newPageNumber >= 1 && newPageNumber <= 11) {
+    // 只允许前进，不允许后退
+    if (newPageNumber >= state.currentPage && newPageNumber <= 11) {
       setCurrentPage(newPageNumber);
     }
   };
 
-  // 防止默认触摸行为以改善滑动体验
-  useEffect(() => {
-    const preventDefault = (e: TouchEvent) => {
-      // 防止多点触控
-      if (e.touches.length > 1) {
-        e.preventDefault();
-      }
-    };
-
-    document.addEventListener('touchstart', preventDefault, { passive: false });
-    
-    return () => {
-      document.removeEventListener('touchstart', preventDefault);
-    };
-  }, []);
+  // 禁用滑动功能后，不需要防止触摸行为
+  // useEffect(() => {
+  //   // 滑动已禁用，移除触摸事件监听
+  // }, []);
 
   const currentIndex = state.currentPage - 1; // 转换为0基础索引
 
@@ -139,7 +129,7 @@ export const CreativeDNATest: React.FC = () => {
       <SwipePageContainer
         currentIndex={currentIndex}
         onPageChange={handlePageChange}
-        enableSwipe={true}
+        enableSwipe={false}
       >
         {allPages}
       </SwipePageContainer>
