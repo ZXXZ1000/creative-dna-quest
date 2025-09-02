@@ -12,6 +12,90 @@ interface QuestionPageProps {
   isCurrentPage?: boolean; // 新增：标识是否为当前页面
 }
 
+const TypewriterLine: React.FC<{
+  text: string;
+  className?: string;
+  style?: React.CSSProperties;
+  startDelay?: number;
+  speed?: number; // ms per char
+  active?: boolean;
+}> = ({ text, className = '', style, startDelay = 0, speed = 40, active = true }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let interval: number | undefined;
+    let timer: number | undefined;
+
+    if (!active) {
+      setCount(0);
+      return () => {};
+    }
+
+    setCount(0);
+    timer = window.setTimeout(() => {
+      interval = window.setInterval(() => {
+        setCount((c) => {
+          if (c >= text.length) {
+            if (interval) window.clearInterval(interval);
+            return c;
+          }
+          return c + 1;
+        });
+      }, Math.max(10, speed));
+    }, Math.max(0, startDelay));
+
+    return () => {
+      if (timer) window.clearTimeout(timer);
+      if (interval) window.clearInterval(interval);
+    };
+  }, [text, startDelay, speed, active]);
+
+  const shown = text.slice(0, count);
+  const done = count >= text.length;
+
+  return (
+    <div className={className} style={style}>
+      <span>{shown}</span>
+      {active && !done && <span className="typewriter-caret" aria-hidden="true" />}
+    </div>
+  );
+};
+
+// CSS-steps-based typewriter (more robust across renders)
+const CssTypewriterLine: React.FC<{
+  text: string;
+  className?: string;
+  style?: React.CSSProperties;
+  startDelay?: number; // ms
+  speed?: number; // ms per char
+  active?: boolean;
+}> = ({ text, className = '', style, startDelay = 0, speed = 40, active = true }) => {
+  const chars = text.length;
+  const duration = Math.max(10, speed) * chars;
+  const delay = Math.max(0, startDelay);
+  const animation = active
+    ? `css-typing ${duration}ms steps(${chars}, end) ${delay}ms forwards`
+    : 'none';
+  return (
+    <div className={className} style={style}>
+      <span
+        className="css-typewriter"
+        style={{
+          // Use CSS variable for final ch width
+          // Multiply by 1ch per character
+          // Note: visual width may vary with proportional fonts, but good enough for preview
+          // @ts-ignore: custom CSS var
+          ['--tw-chars' as any]: `${chars}ch`,
+          animation,
+        }}
+      >
+        {text}
+      </span>
+      {active && <span className="typewriter-caret" aria-hidden="true" />}
+    </div>
+  );
+};
+
 export const QuestionPage: React.FC<QuestionPageProps> = ({
   question,
   questionNumber,
@@ -34,14 +118,14 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
       setIsExiting(false);
       setIsVisible(false);
       
-      // 立即开始入场动画，无延迟
+      // 立即开始入场动画，同时也作为逐字的激活信号
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 100); // 最小延迟，保证状态更新完成
+      }, 50);
       
       return () => clearTimeout(timer);
     } else {
-      // 不再是当前页面时，立即隐藏
+      // 离开当前页时，重置状态，确保下次进入能重新触发打字
       setIsVisible(false);
       setIsExiting(false);
     }
@@ -178,6 +262,39 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
   const questionLines = formatQuestionText(question.text);
 
+  // Q1 typing timing configuration
+  const isQ1 = questionNumber === 1;
+  const typingSpeedMs = 90; // slower per-char speed
+  const lineGapMs = 180; // pause between lines
+  const l1Chars = questionLines.line1?.text.length || 0;
+  const l2Chars = questionLines.line2?.text.length || 0;
+  const l3Chars = questionLines.line3?.text.length || 0;
+  const l4Chars = questionLines.line4?.text.length || 0;
+  const d1 = 0;
+  const d2 = d1 + l1Chars * typingSpeedMs + lineGapMs;
+  const d3 = d2 + l2Chars * typingSpeedMs + lineGapMs;
+  const d4 = d3 + l3Chars * typingSpeedMs + lineGapMs;
+  const totalTypingMs = d4 + l4Chars * typingSpeedMs; // end time of last char
+
+  const [optionsLocked, setOptionsLocked] = useState(false);
+  const [optionsVisible, setOptionsVisible] = useState(false); // decouple visibility to avoid flash
+  useEffect(() => {
+    if (!isQ1) { setOptionsLocked(false); return; }
+    if (isCurrentPage) {
+      setOptionsLocked(true);
+      setOptionsVisible(false);
+      const t = window.setTimeout(() => {
+        setOptionsLocked(false);
+        // show on next frame to ensure animation class is applied before reveal
+        requestAnimationFrame(() => setOptionsVisible(true));
+      }, totalTypingMs + 10);
+      return () => window.clearTimeout(t);
+    } else {
+      setOptionsLocked(true);
+      setOptionsVisible(false);
+    }
+  }, [isQ1, isCurrentPage, totalTypingMs]);
+
   // 根据问题编号获取动画主题
   const getAnimationTheme = (questionNum: number) => {
     const themes = {
@@ -230,6 +347,9 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   const getTextAnimationClass = (lineIndex: number) => {
     const theme = getAnimationTheme(questionNumber);
     
+    // For Q1 we rely on per-character animation only
+    if (questionNumber === 1) return '';
+
     if (questionNumber === 2) {
       // 左右交叉：奇数行从左进入，偶数行从右进入
       return lineIndex % 2 === 0 ? 'animate-slide-cross-left' : 'animate-slide-cross-right';
@@ -329,72 +449,136 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
         {/* 问题标题 */}
         <div className="mt-16 mb-12">
           {questionLines.line1 && (
-            <div 
-              className={`text-black transition-all duration-500 font-rm ${
-                isVisible ? `${getTextAnimationClass(0)}` : 
-                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ 
-                animationDelay: getAnimationDelay(0, 'text'),
-                fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
-                fontWeight: questionLines.line1.fontWeight,
-                lineHeight: '1.3',
-                marginBottom: '6px'
-              }}
-            >
-              {questionLines.line1.text}
-            </div>
+            questionNumber === 1 ? (
+              <CssTypewriterLine
+                text={questionLines.line1.text}
+                className={`text-black font-rm`}
+                style={{
+                  fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line1.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: '6px'
+                }}
+                startDelay={d1}
+                speed={typingSpeedMs}
+                active={isCurrentPage}
+              />
+            ) : (
+              <div 
+                className={`text-black transition-all duration-500 font-rm ${
+                  isVisible ? `${getTextAnimationClass(0)}` : 
+                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+                }`}
+                style={{ 
+                  animationDelay: getAnimationDelay(0, 'text'),
+                  fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line1.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: '6px'
+                }}
+              >
+                {questionLines.line1.text}
+              </div>
+            )
           )}
           {questionLines.line2 && (
-            <div 
-              className={`text-black transition-all duration-500 font-rm ${
-                isVisible ? `${getTextAnimationClass(1)}` : 
-                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ 
-                animationDelay: getAnimationDelay(1, 'text'),
-                fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
-                fontWeight: questionLines.line2.fontWeight,
-                lineHeight: '1.3',
-                marginBottom: '6px'
-              }}
-            >
-              {questionLines.line2.text}
-            </div>
+            questionNumber === 1 ? (
+              <CssTypewriterLine
+                text={questionLines.line2.text}
+                className={`text-black font-rm`}
+                style={{ 
+                  fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line2.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: '6px'
+                }}
+                startDelay={d2}
+                speed={typingSpeedMs}
+                active={isCurrentPage}
+              />
+            ) : (
+              <div 
+                className={`text-black transition-all duration-500 font-rm ${
+                  isVisible ? `${getTextAnimationClass(1)}` : 
+                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+                }`}
+                style={{ 
+                  animationDelay: getAnimationDelay(1, 'text'),
+                  fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line2.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: '6px'
+                }}
+              >
+                {questionLines.line2.text}
+              </div>
+            )
           )}
           {questionLines.line3 && (
-            <div 
-              className={`text-black transition-all duration-500 font-rm ${
-                isVisible ? `${getTextAnimationClass(2)}` : 
-                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ 
-                animationDelay: getAnimationDelay(2, 'text'),
-                fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
-                fontWeight: questionLines.line3.fontWeight,
-                lineHeight: '1.3',
-                marginBottom: '6px'
-              }}
-            >
-              {questionLines.line3.text}
-            </div>
+            questionNumber === 1 ? (
+              <CssTypewriterLine
+                text={questionLines.line3.text}
+                className={`text-black font-rm`}
+                style={{ 
+                  fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line3.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: '6px'
+                }}
+                startDelay={d3}
+                speed={typingSpeedMs}
+                active={isCurrentPage}
+              />
+            ) : (
+              <div 
+                className={`text-black transition-all duration-500 font-rm ${
+                  isVisible ? `${getTextAnimationClass(2)}` : 
+                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+                }`}
+                style={{ 
+                  animationDelay: getAnimationDelay(2, 'text'),
+                  fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line3.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: '6px'
+                }}
+              >
+                {questionLines.line3.text}
+              </div>
+            )
           )}
           {questionLines.line4 && (
-            <div 
-              className={`text-black transition-all duration-500 font-rm ${
-                isVisible ? `${getTextAnimationClass(3)}` : 
-                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ 
-                animationDelay: getAnimationDelay(3, 'text'),
-                fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
-                fontWeight: questionLines.line4.fontWeight,
-                lineHeight: '1.3',
-                marginBottom: questionLines.line5 ? '6px' : '0px'
-              }}
-            >
-              {questionLines.line4.text}
-            </div>
+            questionNumber === 1 ? (
+              <CssTypewriterLine
+                text={questionLines.line4.text}
+                className={`text-black font-rm`}
+                style={{ 
+                  fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line4.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: questionLines.line5 ? '6px' : '0px'
+                }}
+                startDelay={d4}
+                speed={typingSpeedMs}
+                active={isCurrentPage}
+              />
+            ) : (
+              <div 
+                className={`text-black transition-all duration-500 font-rm ${
+                  isVisible ? `${getTextAnimationClass(3)}` : 
+                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
+                }`}
+                style={{ 
+                  animationDelay: getAnimationDelay(3, 'text'),
+                  fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
+                  fontWeight: questionLines.line4.fontWeight,
+                  lineHeight: '1.3',
+                  marginBottom: questionLines.line5 ? '6px' : '0px'
+                }}
+              >
+                {questionLines.line4.text}
+              </div>
+            )
           )}
           {questionLines.line5 && (
             <div 
@@ -417,29 +601,35 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
         {/* 选项按钮布局 */}
         <div className="space-y-3 mb-8 mx-auto mt-6" style={{ maxWidth: '340px' }}>
-          {question.options.map((option, index) => (
-            <button
-              key={option.id}
-              onClick={() => handleOptionSelect(option.id, option.scores)}
-              disabled={isProcessing}
-              className={`w-full text-left flex items-center elegant-hover ${
-                selected === option.id ? 'selected-highlight' : ''
-              } ${
-                isProcessing ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-              } ${
-                isVisible ? `${getOptionAnimationClass(index)}` : 
-                isExiting ? 'opacity-0 translate-x-8' : 'opacity-0 translate-y-4'
-              }`}
-              style={{ 
-                animationDelay: getAnimationDelay(index, 'option'),
-                borderRadius: 'calc(16px * var(--responsive-scale))',
-                height: 'calc(64px * var(--responsive-scale))',
-                backgroundColor: selected === option.id ? '#FFD700' : '#F5F5F5',
-                paddingLeft: '20px',
-                paddingRight: '20px',
-                minHeight: 'calc(44px * var(--responsive-scale))'
-              }}
-            >
+          {(!isQ1 || optionsVisible) && question.options.map((option, index) => {
+            const locked = isQ1 && optionsLocked;
+            const baseAnimClass = (!locked && isVisible)
+              ? getOptionAnimationClass(index)
+              : '';
+            return (
+              <button
+                key={option.id}
+                onClick={() => handleOptionSelect(option.id, option.scores)}
+                disabled={isProcessing || locked}
+                className={`w-full text-left flex items-center elegant-hover ${
+                  selected === option.id ? 'selected-highlight' : ''
+                } ${
+                  (isProcessing || locked) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                } ${
+                  baseAnimClass
+                }`}
+                style={{ 
+                  animationDelay: (!locked && isVisible && !isExiting)
+                    ? (isQ1 ? `${(index * 0.1).toFixed(2)}s` : getAnimationDelay(index, 'option'))
+                    : undefined,
+                  borderRadius: 'calc(16px * var(--responsive-scale))',
+                  height: 'calc(64px * var(--responsive-scale))',
+                  backgroundColor: selected === option.id ? '#FFD700' : '#F5F5F5',
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                  minHeight: 'calc(44px * var(--responsive-scale))',
+                }}
+              >
               {/* 左侧圆点指示器 */}
               <div 
                 className="rounded-full flex-shrink-0 transition-all duration-300"
@@ -463,8 +653,9 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
               >
                 {option.text}
               </span>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
 
