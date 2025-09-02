@@ -13,6 +13,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
     <div className="h-screen w-full relative overflow-hidden" style={{ 
       backgroundColor: '#f8f8f8'
     }}>
+      {/* Bottom-layer Background Image */}
+      <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
+        <img
+          src="/assets/bg/group-45-2.png"
+          alt="Background"
+          className="select-none"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            transform: 'scale(1) translateY(5vh)',
+            transformOrigin: 'center center'
+          }}
+        />
+      </div>
       {/* ASCII Art Background - 与页面相似尺寸，居中自适应 */}
       <div 
         className="absolute inset-0 z-0 animate-ascii-fade-center landing-ascii-bg"
@@ -31,89 +46,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             width: 'min(100vmin, 100vw)',
             height: 'min(100vmin, 100dvh)',
             objectFit: 'contain',
-            transform: 'translateY(30dvh) scale(2)',
+            transform: 'translateY(25dvh) scale(2)',
             transformOrigin: 'center center'
           }}
         />
       </div>
       
+      {/* Bookmarks removed per new design */}
       
-      {/* Bookmarks - 响应式定位 */}
-      <div className="absolute top-12 left-0 right-0 z-10 bookmark-container" style={{ height: 'calc(8rem * var(--responsive-scale))' }}>
-        {/* Bookmark 1 - Yellow (START) */}
-        <div 
-          className="absolute bg-yellow-400 transform -skew-x-12 flex items-center justify-center bookmark-wave" 
-          style={{ 
-            left: 'calc(3rem * var(--responsive-scale))',
-            top: 'calc(2rem * var(--responsive-scale))',
-            width: 'calc(6rem * var(--responsive-scale))',
-            height: 'calc(4rem * var(--responsive-scale))',
-            animationDelay: '0.1s' 
-          }}
-        >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">01 START</div>
-        </div>
-        
-        {/* Bookmark 2 - Gray */}
-        <div 
-          className="absolute bg-gray-300 transform -skew-x-12 flex items-center justify-center bookmark-wave" 
-          style={{ 
-            left: 'calc(8rem * var(--responsive-scale))',
-            top: 'calc(1rem * var(--responsive-scale))',
-            width: 'calc(8rem * var(--responsive-scale))',
-            height: 'calc(4rem * var(--responsive-scale))',
-            animationDelay: '0.3s' 
-          }}
-        >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">04 THE BUILDER</div>
-        </div>
-        
-        {/* Bookmark 3 - Light Gray */}
-        <div 
-          className="absolute bg-gray-200 transform -skew-x-12 flex items-center justify-center bookmark-wave" 
-          style={{ 
-            right: 'calc(6rem * var(--responsive-scale))',
-            top: '0',
-            width: 'calc(8rem * var(--responsive-scale))',
-            height: 'calc(4rem * var(--responsive-scale))',
-            animationDelay: '0.5s' 
-          }}
-        >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">04 THE BUILDER</div>
-        </div>
-        
-        {/* Bookmark 4 - Yellow */}
-        <div 
-          className="absolute bg-yellow-300 transform -skew-x-12 flex items-center justify-center bookmark-wave" 
-          style={{ 
-            right: 'calc(2rem * var(--responsive-scale))',
-            top: 'calc(1.5rem * var(--responsive-scale))',
-            width: 'calc(8rem * var(--responsive-scale))',
-            height: 'calc(4rem * var(--responsive-scale))',
-            animationDelay: '0.7s' 
-          }}
-        >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">03 THE BUILDER</div>
-        </div>
-        
-        {/* Bookmark 5 - Light Gray */}
-        <div 
-          className="absolute bg-gray-100 border border-gray-300 transform -skew-x-12 flex items-center justify-center bookmark-wave" 
-          style={{ 
-            right: '0',
-            top: 'calc(0.5rem * var(--responsive-scale))',
-            width: 'calc(8rem * var(--responsive-scale))',
-            height: 'calc(4rem * var(--responsive-scale))',
-            animationDelay: '0.9s' 
-          }}
-        >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">05 THE BUILDER</div>
-        </div>
-      </div>
-      
-      {/* HOTO Brand Logo (size halved) */}
+      {/* HOTO Brand Logo (top-left) */}
       <div className="absolute z-10" style={{
-        top: 'calc(8rem * var(--responsive-scale))',
+        top: 'calc(3rem * var(--responsive-scale) + env(safe-area-inset-top))',
         left: 'calc(1rem * var(--responsive-scale))'
       }}>
         {/* Use transparent-processed logo */}
@@ -134,27 +77,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Main Title - 响应式排版 */}
-        <div className="text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <h2 className="r-text-5xl font-light leading-tight text-black" style={{
-            marginBottom: 'calc(1.5rem * var(--responsive-scale))'
-          }}>
-            <span className="italic font-extralight">What's Your</span>
-            <br />
-            <span className="italic font-extralight">Creative </span>
-            <span className="font-bold" style={{ 
-              fontSize: 'calc(3.5rem * var(--responsive-scale))',
-              background: 'linear-gradient(45deg, #333, #666)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
-            }}>Gene</span>
-            <span className="r-text-6xl font-light">?</span>
-          </h2>
-        </div>
+        {/* Main Title removed per new design */}
         
         {/* Subtitle */}
-        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
+        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s', marginTop: '20vh' }}>
           <div className="text-gray-600 r-text-lg leading-relaxed font-rm" style={{
             paddingLeft: 'calc(0.5rem * var(--responsive-scale))',
             paddingRight: 'calc(0.5rem * var(--responsive-scale))'
