@@ -679,18 +679,6 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
         </p>
       </div>
 
-      {/* 底部导航指示条 */}
-      <div className={`absolute left-1/2 transform -translate-x-1/2 bg-black z-10 transition-all duration-700 ${
-        isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-      }`} 
-      style={{ 
-        bottom: 'calc(12px + env(safe-area-inset-bottom))',
-        width: '134px',
-        height: '5px',
-        borderRadius: '2.5px',
-        animationDelay: '0.9s'
-      }} />
-
     </div>
   );
 };

@@ -76,7 +76,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
           {/* 标题居中 */}
           <div className="text-center">
             <h2 className="text-2xl font-bold text-black">Almost Done!</h2>
-            <p className="text-gray-700">
+            <p className="text-gray-800">
               Tell us a bit about yourself to get your personalized results
             </p>
           </div>
@@ -100,7 +100,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
                     : 'border-gray-200 focus:border-yellow-400'
                   } focus:outline-none`}
               />
-              <div className="absolute right-3 bottom-3 text-xs text-gray-700">
+              <div className="absolute right-3 bottom-3 text-xs text-black">
                 {name.length}/20
               </div>
             </div>
@@ -126,7 +126,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
-            <p className="text-xs text-gray-700 mt-1">
+            <p className="text-xs text-gray-800 mt-1">
               We'll send you your results and creative tips
             </p>
           </div>
@@ -167,7 +167,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
               <label htmlFor="email-subscription" className="text-sm font-medium cursor-pointer text-gray-800">
                 Get product updates and creative tips
               </label>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-700 mt-1">
                 
               </p>
             </div>
@@ -191,7 +191,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
               <div className="text-center space-y-4">
                 <div className="text-4xl">🎁</div>
                 <h3 className="text-lg font-semibold">Don't miss out!</h3>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-800">
                   Add your email to receive your personalized Creative DNA results and future creative inspiration!
                 </p>
                 <div className="space-y-3 pt-2">

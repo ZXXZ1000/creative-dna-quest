@@ -207,47 +207,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
       </div>
       
-      {/* Bottom navigation bar simulation */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-black r-rounded-3xl z-10" style={{
-        width: 'calc(8rem * var(--responsive-scale))',
-        height: 'calc(0.25rem * var(--responsive-scale))'
-      }}></div>
-      
       {/* Science Behind Modal */}
       {showScienceModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50" style={{
-          padding: 'calc(1.5rem * var(--responsive-scale))'
+          padding: 'clamp(1rem, 5vw, 2rem)'
         }}>
-            <div className="bg-white w-full animate-scale-in shadow-2xl" style={{ 
-              maxWidth: 'calc(28rem * var(--responsive-scale) * 0.75)', 
-              height: 'calc(37.5rem * var(--responsive-scale))'
+            <div className="bg-white w-full animate-scale-in shadow-2xl relative" style={{ 
+              maxWidth: 'clamp(320px, 85vw, 480px)', 
+              height: 'clamp(550px, 85vh, 650px)',
+              width: '100%'
             }}>
             {/* Modal Header - White background with folder tab */}
             <div className="bg-white relative" style={{
-              paddingLeft: 'calc(2rem * var(--responsive-scale))',
-              paddingRight: 'calc(2rem * var(--responsive-scale))',
-              paddingTop: 'calc(1.5rem * var(--responsive-scale))',
-              paddingBottom: 'calc(1.5rem * var(--responsive-scale))',
-              height: 'calc(5rem * var(--responsive-scale))'
+              paddingLeft: 'clamp(1rem, 4vw, 2rem)',
+              paddingRight: 'clamp(1rem, 4vw, 2rem)',
+              paddingTop: 'clamp(1rem, 3vw, 1.5rem)',
+              paddingBottom: 'clamp(1rem, 3vw, 1.5rem)',
+              height: 'clamp(65px, 12vh, 85px)'
             }}>
               <Logo
                 src="/assets/logos/logo.jpg"
                 alt="HOTO Logo"
-                height={'calc(1.25rem * var(--responsive-scale))'}
+                height={'clamp(20px, 5vw, 30px)'}
               />
               {/* Folder tab label in top right - like file folder */}
               <div className="absolute top-0" style={{
-                right: 'calc(3rem * var(--responsive-scale))'
+                right: 'clamp(1.5rem, 6vw, 3rem)'
               }}>
                 <div 
                   className="text-white r-text-xs font-medium relative font-rm"
                   style={{ 
                     backgroundColor: '#5a5a5a',
                     clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%)',
-                    paddingLeft: 'calc(1rem * var(--responsive-scale))',
-                    paddingRight: 'calc(1rem * var(--responsive-scale))',
-                    paddingTop: 'calc(0.5rem * var(--responsive-scale))',
-                    paddingBottom: 'calc(0.5rem * var(--responsive-scale))'
+                    paddingLeft: 'clamp(0.5rem, 2vw, 1rem)',
+                    paddingRight: 'clamp(0.5rem, 2vw, 1rem)',
+                    paddingTop: 'clamp(0.25rem, 1vw, 0.5rem)',
+                    paddingBottom: 'clamp(0.25rem, 1vw, 0.5rem)',
+                    fontSize: 'clamp(0.7rem, 2.5vw, 0.875rem)'
                   }}
                 >
                   THE SCIENCE BEHIND
@@ -258,61 +254,72 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             {/* Modal Content - Medium gray background */}
             <div style={{ 
               backgroundColor: '#5a5a5a', 
-              height: 'calc(100% - 5rem * var(--responsive-scale))',
-              paddingLeft: 'calc(2rem * var(--responsive-scale))',
-              paddingRight: 'calc(2rem * var(--responsive-scale))',
-              paddingTop: 'calc(2.5rem * var(--responsive-scale))',
-              paddingBottom: 'calc(2.5rem * var(--responsive-scale))'
+              height: 'calc(100% - clamp(65px, 12vh, 85px))',
+              paddingLeft: 'clamp(1.2rem, 5vw, 2.5rem)',
+              paddingRight: 'clamp(1.2rem, 5vw, 2.5rem)',
+              paddingTop: 'clamp(2rem, 6vw, 3rem)',
+              paddingBottom: 'clamp(2.5rem, 7vw, 4rem)',
+              overflowY: 'auto'
             }}>
               <h3 className="r-text-3xl font-light tracking-wide text-white font-rm" style={{
-                marginBottom: 'calc(2.5rem * var(--responsive-scale))'
+                marginBottom: 'clamp(2rem, 6vw, 3rem)',
+                fontSize: 'clamp(1.8rem, 6vw, 2.2rem)'
               }}>
                 THE SCIENCE BEHIND
               </h3>
               
               <div className="text-base leading-relaxed" style={{
-                gap: 'calc(1.5rem * var(--responsive-scale))',
+                gap: 'clamp(1.5rem, 4vw, 2rem)',
                 display: 'flex',
                 flexDirection: 'column'
               }}>
-                <p className="text-white r-text-base font-rm">
+                <p className="text-white r-text-base font-rm" style={{
+                  fontSize: 'clamp(1rem, 3.5vw, 1.1rem)',
+                  lineHeight: '1.8'
+                }}>
                   Based on decades of research in creativity psychology, this test identifies your unique creative DNA - the psychological patterns that drive how you approach making, building, and creating.
                 </p>
                 
-                <p className="text-white r-text-base font-rm">
+                <p className="text-white r-text-base font-rm" style={{
+                  fontSize: 'clamp(1rem, 3.5vw, 1.1rem)',
+                  lineHeight: '1.8'
+                }}>
                   Drawing from <strong className="text-white">Torrance Creative Thinking Test (1962)</strong> & <strong className="text-white">Gough Creative Personality Scale (1979)</strong>.
                 </p>
               </div>
               
               <div style={{
-                marginTop: 'calc(4rem * var(--responsive-scale))',
-                marginBottom: 'calc(3rem * var(--responsive-scale))'
+                marginTop: 'clamp(2.5rem, 7vw, 5rem)',
+                marginBottom: 'clamp(2rem, 5vw, 3.5rem)'
               }}>
-                <p className="r-text-lg text-white">Ready to discover your type?</p>
+                <p className="r-text-lg text-white" style={{
+                  fontSize: 'clamp(1.1rem, 4.5vw, 1.4rem)'
+                }}>Ready to discover your type?</p>
               </div>
-              
-              {/* Oval button positioned to intersect with bottom edge */}
-              <div className="relative h-0">
-                <button 
-                  onClick={() => {
-                    setShowScienceModal(false);
-                    if (agreementChecked) {
-                      onStart();
-                    }
-                  }}
-                  className="absolute bg-white text-gray-800 font-medium hover:bg-gray-100 transition-colors flex items-center justify-center r-text-base"
-                  style={{ 
-                    width: 'calc(3rem * var(--responsive-scale))',
-                    height: 'calc(1.5rem * var(--responsive-scale))',
-                    borderRadius: 'calc(0.75rem * var(--responsive-scale))',
-                    right: 'calc(2rem * var(--responsive-scale))',
-                    bottom: 'calc(0.5rem * var(--responsive-scale))',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                  }}
-                >
-                  →
-                </button>
-              </div>
+            </div>
+            
+            {/* Oval button positioned at bottom-right of modal */}
+            <div className="absolute bottom-0 right-0 z-10" style={{
+              padding: 'clamp(1rem, 3vw, 2rem)'
+            }}>
+              <button 
+                onClick={() => {
+                  setShowScienceModal(false);
+                  if (agreementChecked) {
+                    onStart();
+                  }
+                }}
+                className="bg-white text-gray-800 font-medium hover:bg-gray-100 transition-colors flex items-center justify-center r-text-base"
+                style={{ 
+                  width: 'clamp(50px, 12vw, 70px)',
+                  height: 'clamp(25px, 6vw, 35px)',
+                  borderRadius: 'clamp(12px, 3vw, 17px)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  fontSize: 'clamp(1.2rem, 5vw, 1.5rem)'
+                }}
+              >
+                →
+              </button>
             </div>
           </div>
         </div>

@@ -186,7 +186,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                 <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                   Achievement Unlocked!
                 </h2>
-                <p className="text-white/70">
+                <p className="text-white">
                   Welcome to the {result.title} family, {userName}{regionEmoji ? ` ${regionEmoji}` : ""}!
                 </p>
               </div>
@@ -333,7 +333,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
             <div className="text-center text-white space-y-2">
               <div className="text-xs opacity-75">I just discovered my Creative DNA!</div>
               <div className="font-bold text-lg">{result.title}</div>
-              <div className="text-sm opacity-90 mt-1">@{userName} {regionEmoji}</div>
+              <div className="text-sm mt-1">@{userName} {regionEmoji}</div>
               <Logo 
                 src="/assets/logos/logo.jpg" 
                 alt="HOTO Logo" 
@@ -372,7 +372,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                 <div className="text-center text-white space-y-3">
                   <div className="text-sm">My Creative DNA is:</div>
                   <div className="text-2xl font-bold">{result.title}</div>
-                  <div className="text-sm">{userName} {regionEmoji}</div>
+                  <div className="text-sm font-medium">{userName} {regionEmoji}</div>
                   <div className="w-24 h-24 mx-auto mt-2 flex items-center justify-center bg-white/20 rounded-md">
                     <div className="text-xs">QR Code</div>
                   </div>
