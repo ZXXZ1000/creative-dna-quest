@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Logo } from '../../components/Logo';
 import { SimplePageContainer } from '../SimplePageContainer';
 import { CreativeProfile } from '../../types/test';
 
@@ -333,7 +334,12 @@ export const ResultPage: React.FC<ResultPageProps> = ({
               <div className="text-xs opacity-75">I just discovered my Creative DNA!</div>
               <div className="font-bold text-lg">{result.title}</div>
               <div className="text-sm opacity-90 mt-1">@{userName} {regionEmoji}</div>
-              <div className="text-xs opacity-75 mt-2">Find yours at HOTO Creative DNA Lab</div>
+              <Logo 
+                src="/dist/logo.jpg" 
+                alt="HOTO Logo" 
+                className="mx-auto mt-2"
+                height={12}
+              />
               <div className="w-24 h-24 mx-auto mt-2 flex items-center justify-center bg-white/20 rounded-md">
                 <div className="text-xs">QR Code</div>
               </div>
@@ -413,7 +419,15 @@ export const ResultPage: React.FC<ResultPageProps> = ({
             🧬 You're one of {rarityPercentage === 5 ? '1 in 20' : rarityPercentage === 10 ? '1 in 10' : '1 in 5'} people with this DNA type
           </p>
           <p className="text-white/40 text-xs">
-            Thank you for exploring your Creative DNA with HOTO
+            <span className="inline-flex items-center gap-1">
+              Thank you for exploring your Creative DNA with 
+              <Logo 
+                src="/dist/logo.jpg" 
+                alt="HOTO Logo" 
+                className="inline-block"
+                height={6}
+              />
+            </span>
           </p>
         </div>
       </div>

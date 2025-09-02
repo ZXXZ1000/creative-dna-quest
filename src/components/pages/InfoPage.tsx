@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SimplePageContainer } from '../SimplePageContainer';
+import { Logo } from '../../components/Logo';
 
 interface InfoPageProps {
   onContinue: (name: string, email: string, region: string, emailSubscription: boolean) => void;
@@ -68,14 +69,9 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
       <div className="space-y-6">
         {/* Header */}
         <div className="space-y-2 animate-scale-in">
-          {/* HOTO Logo - 左上角定位 */}
+          {/* HOTO Logo - 左上角定位（替换文字为图片组件） */}
           <div className="mb-8 text-left">
-            <h1 className="text-3xl font-black text-black tracking-wider">
-              <span className="hoto-letter hoto-letter-h">H</span>
-              <span className="hoto-letter hoto-letter-o1">O</span>
-              <span className="hoto-letter hoto-letter-t">T</span>
-              <span className="hoto-letter hoto-letter-o2">O</span>
-            </h1>
+            <Logo src="/dist/logo.jpg" alt="HOTO Logo" height={24} />
           </div>
           {/* 标题居中 */}
           <div className="text-center">

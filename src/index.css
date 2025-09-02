@@ -2,6 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom font: RM Neue */
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-Regular.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-Italic.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-Light.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-LightItalic.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-LightItalic.woff') format('woff');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-SemiBold.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-SemiBoldItalic.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-SemiBoldItalic.woff') format('woff');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-Bold.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-BoldItalic.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-BoldItalic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-Black.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-Black.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RM Neue';
+  src: url('/assets/fonts/rm-neue/RMNeue-BlackItalic.woff2') format('woff2'),
+       url('/assets/fonts/rm-neue/RMNeue-BlackItalic.woff') format('woff');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* HOTO Creative DNA Test Design System */
 
 @layer base {

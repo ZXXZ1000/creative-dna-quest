@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { Logo } from '../../components/Logo';
 
 interface LandingPageProps {
   onStart: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
-  const [agreementChecked, setAgreementChecked] = useState(false); // Changed to false by default
+  const [agreementChecked, setAgreementChecked] = useState(true); // Default checked per spec
   const [showScienceModal, setShowScienceModal] = useState(false);
 
   return (
@@ -50,7 +51,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             animationDelay: '0.1s' 
           }}
         >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs">01 START</div>
+          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">01 START</div>
         </div>
         
         {/* Bookmark 2 - Gray */}
@@ -64,7 +65,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             animationDelay: '0.3s' 
           }}
         >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs">04 THE BUILDER</div>
+          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">04 THE BUILDER</div>
         </div>
         
         {/* Bookmark 3 - Light Gray */}
@@ -78,7 +79,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             animationDelay: '0.5s' 
           }}
         >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs">04 THE BUILDER</div>
+          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">04 THE BUILDER</div>
         </div>
         
         {/* Bookmark 4 - Yellow */}
@@ -92,7 +93,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             animationDelay: '0.7s' 
           }}
         >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs">03 THE BUILDER</div>
+          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">03 THE BUILDER</div>
         </div>
         
         {/* Bookmark 5 - Light Gray */}
@@ -106,21 +107,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             animationDelay: '0.9s' 
           }}
         >
-          <div className="transform skew-x-12 text-black font-bold r-text-xs">05 THE BUILDER</div>
+          <div className="transform skew-x-12 text-black font-bold r-text-xs font-rm">05 THE BUILDER</div>
         </div>
       </div>
       
-      {/* HOTO Brand */}
+      {/* HOTO Brand Logo (size halved) */}
       <div className="absolute z-10" style={{
         top: 'calc(8rem * var(--responsive-scale))',
         left: 'calc(1rem * var(--responsive-scale))'
       }}>
-        <h1 className="text-black r-text-4xl font-black tracking-tight animate-fade-in">
-          <span className="hoto-letter hoto-letter-h">H</span>
-          <span className="hoto-letter hoto-letter-o1">O</span>
-          <span className="hoto-letter hoto-letter-t">T</span>
-          <span className="hoto-letter hoto-letter-o2">O</span>
-        </h1>
+        {/* Use transparent-processed logo */}
+        <Logo
+          src="/dist/logo.jpg"
+          alt="HOTO Logo"
+          className="animate-fade-in"
+          height={'calc(1.5rem * var(--responsive-scale))'}
+        />
       </div>
 
       {/* Main Content Area */}
@@ -153,14 +155,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         
         {/* Subtitle */}
         <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <p className="text-gray-600 r-text-lg leading-relaxed" style={{
+          <div className="text-gray-600 r-text-lg leading-relaxed font-rm" style={{
             paddingLeft: 'calc(0.5rem * var(--responsive-scale))',
             paddingRight: 'calc(0.5rem * var(--responsive-scale))'
           }}>
-            What drives your creativity? Are you a<br />
-            systematic organizer, a visionary innovator, or<br />
-            something entirely different?
-          </p>
+            <span className="block" style={{ whiteSpace: 'nowrap' }}>What drives your creativity? Are you a</span>
+            <span className="block" style={{ whiteSpace: 'nowrap' }}>systematic organizer, a visionary innovator, or</span>
+            <span className="block" style={{ whiteSpace: 'nowrap' }}>something entirely different?</span>
+          </div>
         </div>
         
       </div>
@@ -204,7 +206,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
           }}
         >
-          <span className="transform skew-x-12 block">START TEST</span>
+          <span className="transform skew-x-12 block font-rm">START TEST</span>
           <div 
             className="absolute -right-2 top-1/2 transform -translate-y-1/2"
             style={{
@@ -229,7 +231,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         bottom: 'calc(6rem * var(--responsive-scale) + env(safe-area-inset-bottom))',
         animationDelay: '1.4s' 
       }}>
-        <p className="text-gray-600 r-text-sm font-medium">8 questions • 1 minute</p>
+        <p className="text-gray-600 r-text-sm font-medium font-rm">8 questions • 1 minute</p>
       </div>
       
       {/* Bottom Elements - 响应式居中 */}
@@ -243,7 +245,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           {/* Science Behind Link */}
           <button 
             onClick={() => setShowScienceModal(true)}
-            className="text-gray-400 r-text-sm underline hover:text-gray-600 transition-colors"
+            className="text-gray-400 r-text-sm underline hover:text-gray-600 transition-colors font-inter"
           >
             THE SCIENCE BEHIND
           </button>
@@ -274,7 +276,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 )}
               </div>
             </div>
-            <span className="text-gray-600 r-text-sm">Agree to terms</span>
+            <span className="text-gray-600 r-text-sm font-inter">Agree to terms</span>
           </label>
         </div>
       </div>
@@ -290,10 +292,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50" style={{
           padding: 'calc(1.5rem * var(--responsive-scale))'
         }}>
-          <div className="bg-white w-full animate-scale-in shadow-2xl" style={{ 
-            maxWidth: 'calc(28rem * var(--responsive-scale))', 
-            height: 'calc(37.5rem * var(--responsive-scale))'
-          }}>
+            <div className="bg-white w-full animate-scale-in shadow-2xl" style={{ 
+              maxWidth: 'calc(28rem * var(--responsive-scale) * 0.75)', 
+              height: 'calc(37.5rem * var(--responsive-scale))'
+            }}>
             {/* Modal Header - White background with folder tab */}
             <div className="bg-white relative" style={{
               paddingLeft: 'calc(2rem * var(--responsive-scale))',
@@ -302,18 +304,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               paddingBottom: 'calc(1.5rem * var(--responsive-scale))',
               height: 'calc(5rem * var(--responsive-scale))'
             }}>
-              <h2 className="r-text-4xl font-black text-black tracking-tight">
-                <span className="hoto-letter hoto-letter-h">H</span>
-                <span className="hoto-letter hoto-letter-o1">O</span>
-                <span className="hoto-letter hoto-letter-t">T</span>
-                <span className="hoto-letter hoto-letter-o2">O</span>
-              </h2>
+              <Logo
+                src="/dist/logo.jpg"
+                alt="HOTO Logo"
+                height={'calc(1.25rem * var(--responsive-scale))'}
+              />
               {/* Folder tab label in top right - like file folder */}
               <div className="absolute top-0" style={{
                 right: 'calc(3rem * var(--responsive-scale))'
               }}>
                 <div 
-                  className="text-white r-text-xs font-medium relative"
+                  className="text-white r-text-xs font-medium relative font-rm"
                   style={{ 
                     backgroundColor: '#5a5a5a',
                     clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%)',
@@ -337,7 +338,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               paddingTop: 'calc(2.5rem * var(--responsive-scale))',
               paddingBottom: 'calc(2.5rem * var(--responsive-scale))'
             }}>
-              <h3 className="r-text-3xl font-light tracking-wide text-white" style={{
+              <h3 className="r-text-3xl font-light tracking-wide text-white font-rm" style={{
                 marginBottom: 'calc(2.5rem * var(--responsive-scale))'
               }}>
                 THE SCIENCE BEHIND
@@ -348,11 +349,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 display: 'flex',
                 flexDirection: 'column'
               }}>
-                <p className="text-white r-text-base">
+                <p className="text-white r-text-base font-rm">
                   Based on decades of research in creativity psychology, this test identifies your unique creative DNA - the psychological patterns that drive how you approach making, building, and creating.
                 </p>
                 
-                <p className="text-white r-text-base">
+                <p className="text-white r-text-base font-rm">
                   Drawing from <strong className="text-white">Torrance Creative Thinking Test (1962)</strong> & <strong className="text-white">Gough Creative Personality Scale (1979)</strong>.
                 </p>
               </div>
@@ -364,7 +365,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 <p className="r-text-lg text-white">Ready to discover your type?</p>
               </div>
               
-              <div className="flex justify-end">
+              {/* Oval button positioned to intersect with bottom edge */}
+              <div className="relative h-0">
                 <button 
                   onClick={() => {
                     setShowScienceModal(false);
@@ -372,13 +374,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                       onStart();
                     }
                   }}
-                  className="bg-white text-gray-800 font-medium hover:bg-gray-100 transition-colors flex items-center justify-center r-text-xl"
+                  className="absolute bg-white text-gray-800 font-medium hover:bg-gray-100 transition-colors flex items-center justify-center r-text-base"
                   style={{ 
-                    borderRadius: 'calc(1.25rem * var(--responsive-scale))',
-                    paddingLeft: 'calc(2rem * var(--responsive-scale))',
-                    paddingRight: 'calc(2rem * var(--responsive-scale))',
-                    paddingTop: 'calc(0.75rem * var(--responsive-scale))',
-                    paddingBottom: 'calc(0.75rem * var(--responsive-scale))'
+                    width: 'calc(3rem * var(--responsive-scale))',
+                    height: 'calc(1.5rem * var(--responsive-scale))',
+                    borderRadius: 'calc(0.75rem * var(--responsive-scale))',
+                    right: 'calc(2rem * var(--responsive-scale))',
+                    bottom: 'calc(0.5rem * var(--responsive-scale))',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
                   }}
                 >
                   →

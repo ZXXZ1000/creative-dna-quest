@@ -86,7 +86,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
   const progress = (questionNumber / totalQuestions) * 100;
 
-  // 解析问题文本，严格按照设计规格的精确字体层次
+  // 解析问题文本（原始适配尺寸）
   const formatQuestionText = (text: string) => {
     // 问题 1: "Your :) ideal Saturday morning starts with..."
     if (text.includes("ideal Saturday morning")) {
@@ -330,7 +330,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
         <div className="mt-16 mb-12">
           {questionLines.line1 && (
             <div 
-              className={`text-black transition-all duration-500 ${
+              className={`text-black transition-all duration-500 font-rm ${
                 isVisible ? `${getTextAnimationClass(0)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
@@ -347,7 +347,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           )}
           {questionLines.line2 && (
             <div 
-              className={`text-black transition-all duration-500 ${
+              className={`text-black transition-all duration-500 font-rm ${
                 isVisible ? `${getTextAnimationClass(1)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
@@ -364,7 +364,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           )}
           {questionLines.line3 && (
             <div 
-              className={`text-black transition-all duration-500 ${
+              className={`text-black transition-all duration-500 font-rm ${
                 isVisible ? `${getTextAnimationClass(2)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
@@ -381,7 +381,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           )}
           {questionLines.line4 && (
             <div 
-              className={`text-black transition-all duration-500 ${
+              className={`text-black transition-all duration-500 font-rm ${
                 isVisible ? `${getTextAnimationClass(3)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
@@ -398,7 +398,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
           )}
           {questionLines.line5 && (
             <div 
-              className={`text-black transition-all duration-500 ${
+              className={`text-black transition-all duration-500 font-rm ${
                 isVisible ? `${getTextAnimationClass(4)}` : 
                 isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
               }`}
@@ -453,7 +453,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
               
               {/* 选项文字 */}
               <span 
-                className="transition-all duration-300"
+                className="transition-all duration-300 font-rm"
                 style={{
                   fontSize: '16px',
                   fontWeight: 500,
@@ -482,6 +482,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
             color: '#999999',
             fontWeight: 400
           }}
+          className="font-rm"
         >
           Powered by HOTO
         </p>
