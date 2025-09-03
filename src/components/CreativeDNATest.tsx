@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTestState } from '../hooks/useTestState';
-import { questions } from '../data/questions';
+import { questions, creativeProfiles } from '../data/questions';
 import { LandingPage } from './pages/LandingPage';
 import { QuestionPage } from './pages/QuestionPage';
 import { InfoPage } from './pages/InfoPage';
@@ -124,11 +124,30 @@ export const CreativeDNATest: React.FC = () => {
   // }, []);
 
   const currentIndex = state.currentPage - 1; // 转换为0基础索引
+  const debugParam = typeof window !== 'undefined'
+    ? (new URLSearchParams(window.location.search).get('debug') || window.location.hash.replace('#', ''))
+    : undefined;
+  const isDebugBuilder = debugParam?.toLowerCase() === 'builder' || debugParam?.toLowerCase() === 'maker';
   const isQuestionPage = state.currentPage >= 2 && state.currentPage <= 9;
   const questionIndex = state.currentPage - 2; // 0-based for questions
   const progress = isQuestionPage
     ? Math.min(Math.max(((questionIndex + 1) / questions.length) * 100, 0), 100)
     : 0;
+
+  if (isDebugBuilder) {
+    return (
+      <div className="min-h-screen overflow-hidden">
+        {/* 固定进度条隐藏（调试结果页不需要） */}
+        <ResultPage
+          result={creativeProfiles.MAKER}
+          userName={state.userInfo.name || 'Debug User'}
+          userRegion={state.userInfo.region || 'United States'}
+          onRestart={handleRestart}
+          onShare={handleShare}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen overflow-hidden">
@@ -139,7 +158,7 @@ export const CreativeDNATest: React.FC = () => {
           style={{ paddingTop: 'calc(16px + env(safe-area-inset-top))' }}
         >
           <div className="px-6 pb-2">
-            <div className="w-full rounded-full" style={{ height: '6px', backgroundColor: '#E0E0E0' }}>
+            <div className="rounded-full" style={{ height: '6px', backgroundColor: '#6c6a6aff', width: '90%', margin: '0 auto' }}>
               <div
                 className="h-full rounded-full transition-[width] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
                 style={{

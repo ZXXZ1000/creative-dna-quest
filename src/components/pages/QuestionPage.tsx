@@ -262,19 +262,23 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
   const questionLines = formatQuestionText(question.text);
 
-  // Q1 typing timing configuration
+  // Typing timing configuration (apply to all questions)
   const isQ1 = questionNumber === 1;
-  const typingSpeedMs = 90; // slower per-char speed
+  const typingSpeedMs = 90; // ms per char
   const lineGapMs = 180; // pause between lines
   const l1Chars = questionLines.line1?.text.length || 0;
   const l2Chars = questionLines.line2?.text.length || 0;
   const l3Chars = questionLines.line3?.text.length || 0;
   const l4Chars = questionLines.line4?.text.length || 0;
+  const l5Chars = questionLines.line5?.text.length || 0;
   const d1 = 0;
   const d2 = d1 + l1Chars * typingSpeedMs + lineGapMs;
   const d3 = d2 + l2Chars * typingSpeedMs + lineGapMs;
   const d4 = d3 + l3Chars * typingSpeedMs + lineGapMs;
-  const totalTypingMs = d4 + l4Chars * typingSpeedMs; // end time of last char
+  const d5 = d4 + l4Chars * typingSpeedMs + lineGapMs;
+  const totalTypingMs = (questionLines as any).line5
+    ? d5 + l5Chars * typingSpeedMs
+    : d4 + l4Chars * typingSpeedMs; // end time of last char
 
   const [optionsLocked, setOptionsLocked] = useState(false);
   const [optionsVisible, setOptionsVisible] = useState(false); // decouple visibility to avoid flash
@@ -441,156 +445,82 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
       {/* 主内容区域 */}
       <div className="relative z-10 px-6">
-        {/* 问题标题 */}
+        {/* 问题标题：所有题目统一使用打字机动画 */}
         <div className="mt-16 mb-12">
           {questionLines.line1 && (
-            questionNumber === 1 ? (
-              <CssTypewriterLine
-                text={questionLines.line1.text}
-                className={`text-black font-rm`}
-                style={{
-                  fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line1.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: '6px'
-                }}
-                startDelay={d1}
-                speed={typingSpeedMs}
-                active={isCurrentPage}
-              />
-            ) : (
-              <div 
-                className={`text-black transition-all duration-500 font-rm ${
-                  isVisible ? `${getTextAnimationClass(0)}` : 
-                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-                }`}
-                style={{ 
-                  animationDelay: getAnimationDelay(0, 'text'),
-                  fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line1.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: '6px'
-                }}
-              >
-                {questionLines.line1.text}
-              </div>
-            )
+            <CssTypewriterLine
+              text={questionLines.line1.text}
+              className={`text-black font-rm`}
+              style={{
+                fontSize: `calc(${questionLines.line1.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line1.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '6px'
+              }}
+              startDelay={d1}
+              speed={typingSpeedMs}
+              active={isCurrentPage}
+            />
           )}
           {questionLines.line2 && (
-            questionNumber === 1 ? (
-              <CssTypewriterLine
-                text={questionLines.line2.text}
-                className={`text-black font-rm`}
-                style={{ 
-                  fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line2.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: '6px'
-                }}
-                startDelay={d2}
-                speed={typingSpeedMs}
-                active={isCurrentPage}
-              />
-            ) : (
-              <div 
-                className={`text-black transition-all duration-500 font-rm ${
-                  isVisible ? `${getTextAnimationClass(1)}` : 
-                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-                }`}
-                style={{ 
-                  animationDelay: getAnimationDelay(1, 'text'),
-                  fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line2.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: '6px'
-                }}
-              >
-                {questionLines.line2.text}
-              </div>
-            )
+            <CssTypewriterLine
+              text={questionLines.line2.text}
+              className={`text-black font-rm`}
+              style={{ 
+                fontSize: `calc(${questionLines.line2.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line2.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '6px'
+              }}
+              startDelay={d2}
+              speed={typingSpeedMs}
+              active={isCurrentPage}
+            />
           )}
           {questionLines.line3 && (
-            questionNumber === 1 ? (
-              <CssTypewriterLine
-                text={questionLines.line3.text}
-                className={`text-black font-rm`}
-                style={{ 
-                  fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line3.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: '6px'
-                }}
-                startDelay={d3}
-                speed={typingSpeedMs}
-                active={isCurrentPage}
-              />
-            ) : (
-              <div 
-                className={`text-black transition-all duration-500 font-rm ${
-                  isVisible ? `${getTextAnimationClass(2)}` : 
-                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-                }`}
-                style={{ 
-                  animationDelay: getAnimationDelay(2, 'text'),
-                  fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line3.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: '6px'
-                }}
-              >
-                {questionLines.line3.text}
-              </div>
-            )
+            <CssTypewriterLine
+              text={questionLines.line3.text}
+              className={`text-black font-rm`}
+              style={{ 
+                fontSize: `calc(${questionLines.line3.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line3.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: '6px'
+              }}
+              startDelay={d3}
+              speed={typingSpeedMs}
+              active={isCurrentPage}
+            />
           )}
           {questionLines.line4 && (
-            questionNumber === 1 ? (
-              <CssTypewriterLine
-                text={questionLines.line4.text}
-                className={`text-black font-rm`}
-                style={{ 
-                  fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line4.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: questionLines.line5 ? '6px' : '0px'
-                }}
-                startDelay={d4}
-                speed={typingSpeedMs}
-                active={isCurrentPage}
-              />
-            ) : (
-              <div 
-                className={`text-black transition-all duration-500 font-rm ${
-                  isVisible ? `${getTextAnimationClass(3)}` : 
-                  isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-                }`}
-                style={{ 
-                  animationDelay: getAnimationDelay(3, 'text'),
-                  fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
-                  fontWeight: questionLines.line4.fontWeight,
-                  lineHeight: '1.3',
-                  marginBottom: questionLines.line5 ? '6px' : '0px'
-                }}
-              >
-                {questionLines.line4.text}
-              </div>
-            )
+            <CssTypewriterLine
+              text={questionLines.line4.text}
+              className={`text-black font-rm`}
+              style={{ 
+                fontSize: `calc(${questionLines.line4.fontSize} * var(--responsive-scale))`,
+                fontWeight: questionLines.line4.fontWeight,
+                lineHeight: '1.3',
+                marginBottom: questionLines.line5 ? '6px' : '0px'
+              }}
+              startDelay={d4}
+              speed={typingSpeedMs}
+              active={isCurrentPage}
+            />
           )}
           {questionLines.line5 && (
-            <div 
-              className={`text-black transition-all duration-500 font-rm ${
-                isVisible ? `${getTextAnimationClass(4)}` : 
-                isExiting ? 'opacity-0 -translate-y-8' : 'opacity-0 translate-y-4'
-              }`}
+            <CssTypewriterLine
+              text={questionLines.line5.text}
+              className={`text-black font-rm`}
               style={{ 
-                animationDelay: getAnimationDelay(4, 'text'),
                 fontSize: `calc(${questionLines.line5.fontSize} * var(--responsive-scale))`,
                 fontWeight: questionLines.line5.fontWeight,
                 lineHeight: '1.3',
                 marginBottom: '0px'
               }}
-            >
-              {questionLines.line5.text}
-            </div>
+              startDelay={d5}
+              speed={typingSpeedMs}
+              active={isCurrentPage}
+            />
           )}
         </div>
 

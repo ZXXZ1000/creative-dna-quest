@@ -42,21 +42,36 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   const [containerHeight, setContainerHeight] = useState(0);
   const [scrollWindowHeight, setScrollWindowHeight] = useState('76vh');
 
-  // 根据创意类型获取用户名标签位置
+  // ========== Username Position Presets (Adjustment Area) ==========
+  // Edit the following presets to fine-tune the username position.
+  // Coordinates x/y are normalized (0..1) relative to the background image.
+  // - x: 0 = left edge, 1 = right edge
+  // - y: 0 = top edge, 1 = bottom edge
+  // Two categories due to image size differences:
+  //   1) builder: applies to MAKER (BULIDER.png)
+  //   2) default: applies to other 5 types (ORGANIZER/LIGHT-SEEKER/INNIVATOR/EXPLORER/CRAFTER)
+  // Optionally add per-type overrides (uncomment and adjust).
+  const POSITION_PRESETS: Record<string, { x: number; y: number; rotation: number }> = {
+    builder: { x: 0.25, y: 0.62, rotation: 0 },
+    default: { x: 0.25, y: 0.62, rotation: 0 },
+    // Example overrides (uncomment to use):
+    // TIDY:   { x: 0.68, y: 0.32, rotation: 0 },
+    // ILLUMA: { x: 0.70, y: 0.34, rotation: 0 },
+    // REFORM: { x: 0.69, y: 0.33, rotation: 0 },
+    // NOMAD:  { x: 0.69, y: 0.33, rotation: 0 },
+    // VISUAL: { x: 0.69, y: 0.33, rotation: 0 },
+  };
+
+  // Toggle to visualize the anchor point for quick adjustments
+  const DEBUG_USERNAME_POSITION = false;
+
+  // Resolve position by type with two-category fallback
   const getUserNamePosition = () => {
-    // 获取当前窗口宽度来计算像素位置
-    const windowWidth = window.innerWidth;
-    
-    const positionMap: Record<string, { left?: string; right?: string; top: string; rotation: number }> = {
-      'MAKER': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.25}px`, rotation: 90 },      // BUILDER - 保持原位置
-      'TIDY': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },       // ORGANIZER
-      'ILLUMA': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },     // LIGHT SEEKER
-      'REFORM': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },     // INNOVATOR  
-      'NOMAD': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },      // EXPLORER
-      'VISUAL': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 }      // CRAFTER
-    };
-    
-    return positionMap[result?.type || 'MAKER'] || positionMap['MAKER'];
+    const type = result?.type || 'MAKER';
+    // Per-type explicit override takes priority if defined in presets
+    if (POSITION_PRESETS[type]) return POSITION_PRESETS[type];
+    // Category-based fallback
+    return type === 'MAKER' ? POSITION_PRESETS.builder : POSITION_PRESETS.default;
   };
 
   // 根据结果类型获取对应的背景图片
@@ -221,42 +236,56 @@ export const ResultPage: React.FC<ResultPageProps> = ({
               height: `${containerHeight}px`, // 使用动态计算的精确高度
               backgroundImage: `url(${getBackgroundImage()})`,
               backgroundSize: '100% auto',
-              backgroundPosition: 'top center',
+              // 除 BUILDER 页面外，其他图片上部裁切 10px（上移背景图）
+              backgroundPosition: (() => {
+                const src = getBackgroundImage();
+                const isBuilder = src.includes('BULIDER.png');
+                // Crop 10px from top for non-builder images
+                return isBuilder ? 'top center' : 'left 50% top -10px';
+              })(),
               backgroundRepeat: 'no-repeat'
             }}
           >
-            {/* User Name - 动态定位到每张图片的最佳位置 */}
+            {/* User Name - 使用百分比相对定位到背景图 */}
             {(() => {
               const position = getUserNamePosition();
-              console.log('Current position:', position, 'Result type:', result?.type); // 调试信息
-              
-              const containerStyle: React.CSSProperties = {
-                position: 'absolute',
-                top: position.top,
-                zIndex: 20
-              };
-              
-              if (position.right) {
-                containerStyle.right = position.right;
-              }
-              if (position.left) {
-                containerStyle.left = position.left;
-              }
-              
+              const src = getBackgroundImage();
+              const isBuilder = src.includes('BULIDER.png');
+              const cropOffsetPx = isBuilder ? 0 : -10; // keep in sync with non-builder crop
+
               return (
-                <div style={containerStyle}>
+                <div style={{
+                  position: 'absolute',
+                  left: `${position.x * 100}%`,
+                  top: `calc(${position.y * 100}% + ${cropOffsetPx}px)`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 20
+                }}>
+                  {DEBUG_USERNAME_POSITION && (
+                    <div style={{
+                      position: 'absolute',
+                      width: '8px',
+                      height: '8px',
+                      background: '#FF0000',
+                      borderRadius: '50%',
+                      top: '-4px',
+                      left: '-4px'
+                    }} />
+                  )}
                   <span className="font-medium" style={{
                     fontFamily: '"PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans CN", "WenQuanYi Micro Hei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                     fontSize: '20px',
-                    color: '#4A5568', // 深灰色 (gray-600)
+                    color: '#FFFFFF',
+                    fontStyle: 'italic',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.6), 0 0 8px rgba(0,0,0,0.35)',
                     transform: `rotate(${position.rotation}deg)`,
                     transformOrigin: 'center center',
                     whiteSpace: 'nowrap',
                     display: 'block',
                     writingMode: 'horizontal-tb',
                     textOrientation: 'mixed',
-                    letterSpacing: '0.8px', // 稍微增加字间距让中文更清晰
-                    fontWeight: 500 // 稍微减轻字重
+                    letterSpacing: '0.8px',
+                    fontWeight: 500
                   }}>
                     @{userName} {regionEmoji}
                   </span>
@@ -282,8 +311,8 @@ export const ResultPage: React.FC<ResultPageProps> = ({
 
       {/* Bottom Action Buttons - Aligned with window bottom */}
       {imageLoaded && (
-        <div className="absolute left-0 right-0 flex justify-between px-6 z-20" style={{
-          top: `calc(40px + ${scrollWindowHeight} + 12px)` // 窗口顶部 + 动态窗口高度 + 间隙
+        <div className="absolute left-0 right-0 flex justify-between px-6 z-15" style={{
+          top: `calc(40px + ${scrollWindowHeight} + 30px)` // 窗口顶部 + 动态窗口高度 + 间隙
         }}>
         <button
           onClick={onRestart}
@@ -299,7 +328,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
         </button>
         <button
           onClick={handleSaveResult}
-          className="px-6 py-2 bg-gray-200 text-black font-medium hover:bg-gray-300 transition-colors"
+          className="px-6 py-1 bg-gray-200 text-black font-medium hover:bg-gray-300 transition-colors"
           style={{
             fontFamily: 'RM Neue, sans-serif',
             fontSize: '14px',
