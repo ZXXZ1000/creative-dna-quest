@@ -48,7 +48,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     const windowWidth = window.innerWidth;
     
     const positionMap: Record<string, { left?: string; right?: string; top: string; rotation: number }> = {
-      'MAKER': { left: `${windowWidth * 0.75}px`, top: `${windowWidth * 0.25}px`, rotation: 90 },      // BUILDER - 保持原位置
+      'MAKER': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.25}px`, rotation: 90 },      // BUILDER - 保持原位置
       'TIDY': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },       // ORGANIZER
       'ILLUMA': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },     // LIGHT SEEKER
       'REFORM': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },     // INNOVATOR  
