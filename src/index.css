@@ -336,7 +336,18 @@
   }
 
   .responsive-container[data-orientation="landscape"] {
-    /* 横屏优化 */
+    /* 横屏优化 - 减小按钮尺寸避免过大 */
+  }
+  
+  .responsive-container[data-orientation="landscape"] .landing-start .landing-start-btn {
+    transform: scale(calc(1.2 * var(--responsive-scale)));
+    max-width: min(60vw, 300px);
+  }
+  
+  /* 宽屏设备进一步缩小按钮 */
+  .responsive-container[data-ar-band="wide"] .landing-start .landing-start-btn {
+    transform: scale(calc(1.0 * var(--responsive-scale)));
+    max-width: min(50vw, 250px);
   }
 
   /* 响应式文本类 */
@@ -759,11 +770,12 @@
     image-rendering: crisp-edges;
   }
 
-  /* Landing start button: clamp尺寸避免小屏过大 */
+  /* Landing start button: 响应式缩放避免横屏过大 */
   .landing-start .landing-start-btn {
     font-size: clamp(16px, calc(18px * var(--responsive-scale)), 20px);
     padding: clamp(10px, calc(12px * var(--responsive-scale)), 16px)
              clamp(28px, calc(36px * var(--responsive-scale)), 44px);
+    transform: scale(calc(1.5 * var(--responsive-scale)));
   }
 
   .page-transition-enter {

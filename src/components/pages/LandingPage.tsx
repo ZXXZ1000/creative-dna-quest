@@ -81,8 +81,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         <div className="text-center space-y-1 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <div className="grid grid-cols-1 gap-1 max-w-xs mx-auto">
             <div className="text-left">
-              <p className="text-gray-500 italic" style={{ 
+              <p className="text-gray-500" style={{ 
                 fontFamily: 'RM Neue, sans-serif',
+                fontWeight: 300,
+                fontStyle: 'italic',
                 fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)'
               }}>
                 Some tinker endlessly.<br />
@@ -90,8 +92,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-gray-500 italic" style={{ 
+              <p className="text-gray-500" style={{ 
                 fontFamily: 'RM Neue, sans-serif',
+                fontWeight: 300,
+                fontStyle: 'italic',
                 fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)'
               }}>
                 Some crave order.<br />
@@ -103,9 +107,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
         {/* Main Title */}
         <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s', marginTop: '1vh' }}>
-          <h1 className="text-black font-bold leading-tight" style={{
+          <h1 className="text-black leading-tight" style={{
             fontSize: 'clamp(2.8rem, 10vw, 4.2rem)',
             fontFamily: 'RM Neue, sans-serif',
+            fontWeight: 900,
             fontStyle: 'italic'
           }}>
             What's Your<br />
@@ -115,11 +120,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         
         {/* Subtitle */}
         <div className="text-center animate-fade-in" style={{ animationDelay: '0.7s', marginTop: '0.5vh' }}>
-          <p className="text-gray-600 leading-relaxed" style={{
+          <p className="text-gray-600" style={{
             fontSize: 'clamp(1.25rem, 4.5vw, 1.4rem)',
             fontFamily: 'RM Neue, sans-serif',
+            fontWeight: 600,
+            fontStyle: 'italic',
             paddingLeft: 'calc(0.5rem * var(--responsive-scale))',
-            paddingRight: 'calc(0.5rem * var(--responsive-scale))'
+            paddingRight: 'calc(0.5rem * var(--responsive-scale))',
+            whiteSpace: 'nowrap'
           }}>
             Like DNA, creativity comes in unique types.
           </p>
@@ -165,7 +173,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               : 'cursor-not-allowed opacity-50'
           }`}
           style={{ 
-            transform: 'scale(1.5)',
             filter: agreementChecked ? 'none' : 'grayscale(100%)'
           }}
         />

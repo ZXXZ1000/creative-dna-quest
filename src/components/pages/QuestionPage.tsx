@@ -168,7 +168,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
     }
   };
 
-  const progress = (questionNumber / totalQuestions) * 100;
+  // 进度条已上移到父级组件渲染
 
   // 解析问题文本（原始适配尺寸）
   const formatQuestionText = (text: string) => {
@@ -394,30 +394,25 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   };
 
   return (
-    <div className={`h-screen w-full relative overflow-hidden bg-white transition-all duration-700 ${
-      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-    }`}>
-      {/* 顶部进度条 */}
-      <div className="absolute top-6 left-6 right-6 z-20">
-        <div className="w-full bg-gray-300 rounded-full" style={{ height: '6px', backgroundColor: '#E0E0E0' }}>
-          <div 
-            className="h-full transition-all duration-1000 ease-out rounded-full"
-            style={{ 
-              width: `${progress}%`,
-              backgroundColor: '#FFD700'
-            }}
-          />
-        </div>
-      </div>
+    <div className={`h-screen w-full relative overflow-hidden bg-white`}>
+      {/* 主视图：保留页面整体入场/退出动画（不影响进度条）*/}
+      <div className={`relative h-full transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`} style={{ paddingTop: 'calc(56px + env(safe-area-inset-top))' }}>
 
-      {/* 右上角ASCII艺术背景 */}
+      {/* 右上角ASCII艺术背景（Q3/4/5/8 进一步下移；Q8 缩小） */}
       <div 
-        className={`absolute top-16 right-0 z-0 question-ascii-right ${
+        className={`absolute right-0 z-0 question-ascii-right ${
           isVisible ? getImageAnimationClass('right', questionNumber) : 'opacity-0 translate-x-8'
         }`}
         style={{ 
           animationDelay: getAnimationDelay(0, 'image'),
-          width: '40%'
+          top: (
+            questionNumber === 8 ? '8.5rem' :
+            [3,4,5].includes(questionNumber) ? '7.5rem' :
+            '6rem'
+          ),
+          width: questionNumber === 8 ? '26%' : '32%'
         }}
       >
         <img 
@@ -427,14 +422,14 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
         />
       </div>
 
-      {/* 左下角黄色ASCII艺术装饰 */}
+      {/* 左下角黄色ASCII艺术装饰（整体下移并缩小） */}
       <div 
-        className={`absolute bottom-80 left-0 z-0 question-ascii-left ${
+        className={`absolute bottom-40 left-0 z-0 question-ascii-left ${
           isVisible ? getImageAnimationClass('left', questionNumber) : 'opacity-0 translate-y-8'
         }`}
         style={{ 
           animationDelay: getAnimationDelay(1, 'image'),
-          width: '35%'
+          width: '30%'
         }}
       >
         <img 
@@ -624,7 +619,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
                     : undefined,
                   borderRadius: 'calc(16px * var(--responsive-scale))',
                   height: 'calc(64px * var(--responsive-scale))',
-                  backgroundColor: selected === option.id ? '#FFD700' : '#F5F5F5',
+                  backgroundColor: selected === option.id ? '#FFED00' : '#F5F5F5',
                   paddingLeft: '20px',
                   paddingRight: '20px',
                   minHeight: 'calc(44px * var(--responsive-scale))',
@@ -677,6 +672,8 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
         >
           Powered by HOTO
         </p>
+      </div>
+
       </div>
 
     </div>

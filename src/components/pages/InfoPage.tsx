@@ -154,31 +154,15 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             )}
           </div>
 
-          {/* Email Subscription */}
-          <div className="flex items-start space-x-3 p-4">
-            <input
-              type="checkbox"
-              id="email-subscription"
-              checked={emailSubscription}
-              onChange={(e) => setEmailSubscription(e.target.checked)}
-              className="mt-0.5 w-4 h-4 text-yellow-400 border-2 border-gray-300 rounded focus:ring-0 flex-shrink-0"
-            />
-            <div className="flex-1">
-              <label htmlFor="email-subscription" className="text-sm font-medium cursor-pointer text-gray-800">
-                Get product updates and creative tips
-              </label>
-              <p className="text-xs text-gray-700 mt-1">
-                
-              </p>
-            </div>
-          </div>
+          {/* Email Subscription removed per requirement */}
         </div>
 
         {/* Continue Button */}
         <div className="pt-4 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <button 
             onClick={handleSubmit}
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95"
+            className="w-full text-black font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 hover:brightness-95"
+            style={{ backgroundColor: '#FFED00' }}
           >
             GET MY RESULTS
           </button>
@@ -197,7 +181,8 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
                 <div className="space-y-3 pt-2">
                   <button 
                     onClick={() => setShowEmailPrompt(false)}
-                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                    className="w-full text-black font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:brightness-95"
+                    style={{ backgroundColor: '#FFED00' }}
                   >
                     I'll add my email
                   </button>
