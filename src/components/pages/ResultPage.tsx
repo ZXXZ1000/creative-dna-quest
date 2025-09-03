@@ -49,11 +49,11 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     
     const positionMap: Record<string, { left?: string; right?: string; top: string; rotation: number }> = {
       'MAKER': { left: `${windowWidth * 0.75}px`, top: `${windowWidth * 0.25}px`, rotation: 90 },      // BUILDER - 保持原位置
-      'TIDY': { left: `${windowWidth * 0.79}px`, top: `${windowWidth * 0.28}px`, rotation: 90 },       // ORGANIZER
-      'ILLUMA': { left: `${windowWidth * 0.79}px`, top: `${windowWidth * 0.30}px`, rotation: 90 },     // LIGHT SEEKER
-      'REFORM': { left: `${windowWidth * 0.79}px`, top: `${windowWidth * 0.26}px`, rotation: 90 },     // INNOVATOR  
-      'NOMAD': { left: `${windowWidth * 0.79}px`, top: `${windowWidth * 0.29}px`, rotation: 90 },      // EXPLORER
-      'VISUAL': { left: `${windowWidth * 0.79}px`, top: `${windowWidth * 0.27}px`, rotation: 90 }      // CRAFTER
+      'TIDY': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },       // ORGANIZER
+      'ILLUMA': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },     // LIGHT SEEKER
+      'REFORM': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },     // INNOVATOR  
+      'NOMAD': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 },      // EXPLORER
+      'VISUAL': { left: `${windowWidth * 0.69}px`, top: `${windowWidth * 0.33}px`, rotation: 90 }      // CRAFTER
     };
     
     return positionMap[result?.type || 'MAKER'] || positionMap['MAKER'];
@@ -64,13 +64,13 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     const imageMap: Record<string, string> = {
       'MAKER': '/assets/result%20page/BULIDER.png',
       'TIDY': '/assets/result%20page/ORGANIZER.png',
-      'ILLUMA': '/assets/result%20page/LIGHT%20SEEKER.png',
+      'ILLUMA': '/assets/result%20page/LIGHT%20SEEKER.png', // 修复：文件名有空格需要正确编码
       'REFORM': '/assets/result%20page/INNIVATOR.png',
       'NOMAD': '/assets/result%20page/EXPLORER.png',
       'VISUAL': '/assets/result%20page/CRAFTER.png'
     };
     
-    return imageMap[result?.type || 'MAKER'] || '/assets/result%20page/BULIDER.png';
+    return imageMap[result?.type || 'MAKER'] || '/assets/result%20page/BULIDER.png'; // 默认回退到BUILDER
   };
 
   // 动态计算图片尺寸和容器高度
@@ -245,7 +245,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                 <div style={containerStyle}>
                   <span className="font-medium" style={{
                     fontFamily: '"PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans CN", "WenQuanYi Micro Hei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    fontSize: '24px',
+                    fontSize: '20px',
                     color: '#4A5568', // 深灰色 (gray-600)
                     transform: `rotate(${position.rotation}deg)`,
                     transformOrigin: 'center center',
