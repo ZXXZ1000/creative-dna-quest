@@ -41,6 +41,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [containerHeight, setContainerHeight] = useState(0);
   const [scrollWindowHeight, setScrollWindowHeight] = useState('76vh');
+  const [overlayWidth, setOverlayWidth] = useState(0); // 图片显示宽度，用于按比例缩放用户名字号
 
   // ========== Username Position Presets (Adjustment Area) ==========
   // Edit the following presets to fine-tune the username position.
@@ -51,9 +52,10 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   //   1) builder: applies to MAKER (BULIDER.png)
   //   2) default: applies to other 5 types (ORGANIZER/LIGHT-SEEKER/INNIVATOR/EXPLORER/CRAFTER)
   // Optionally add per-type overrides (uncomment and adjust).
-  const POSITION_PRESETS: Record<string, { x: number; y: number; rotation: number }> = {
-    builder: { x: 0.25, y: 0.62, rotation: 0 },
-    default: { x: 0.25, y: 0.62, rotation: 0 },
+  const POSITION_PRESETS: Record<string, { x: number; y: number; rotation: number; fontScale: number }> = {
+    // fontScale: 字号 = fontScale * 图片显示宽度（可按需要微调）
+    builder: { x: 0.25, y: 0.62, rotation: 0, fontScale: 0.05 },
+    default: { x: 0.25, y: 0.58, rotation: 0, fontScale: 0.05 },
     // Example overrides (uncomment to use):
     // TIDY:   { x: 0.68, y: 0.32, rotation: 0 },
     // ILLUMA: { x: 0.70, y: 0.34, rotation: 0 },
@@ -111,6 +113,12 @@ export const ResultPage: React.FC<ResultPageProps> = ({
         
         // 设置容器高度为图片实际显示高度
         setContainerHeight(displayHeight);
+        // 记录当前图片显示宽度（容器 clientWidth）
+        requestAnimationFrame(() => {
+          if (exportRef.current) {
+            setOverlayWidth(exportRef.current.clientWidth);
+          }
+        });
         
         // 计算合适的滑动窗口高度
         const windowHeight = window.innerHeight;
@@ -150,6 +158,9 @@ export const ResultPage: React.FC<ResultPageProps> = ({
         const scrollHeight = Math.min(displayHeight, availableHeight);
         
         setScrollWindowHeight(`${scrollHeight}px`);
+        if (exportRef.current) {
+          setOverlayWidth(exportRef.current.clientWidth);
+        }
       }
     };
 
@@ -241,7 +252,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                 const src = getBackgroundImage();
                 const isBuilder = src.includes('BULIDER.png');
                 // Crop 10px from top for non-builder images
-                return isBuilder ? 'top center' : 'left 50% top -10px';
+                return isBuilder ? 'top center' : 'left 50% top -50px';
               })(),
               backgroundRepeat: 'no-repeat'
             }}
@@ -272,9 +283,15 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                       left: '-4px'
                     }} />
                   )}
-                  <span className="font-medium" style={{
+                  {(() => {
+                    // 计算相对字号，避免不同屏幕比例导致用户名过大/过小
+                    const fontScale = position.fontScale || 0.048;
+                    const rawSize = overlayWidth * fontScale;
+                    const fontSizePx = Math.max(14, Math.min(rawSize, 28)); // 轻度夹持，便于阅读
+                    return (
+                      <span className="font-medium" style={{
                     fontFamily: '"PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans CN", "WenQuanYi Micro Hei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                    fontSize: '20px',
+                    fontSize: `${fontSizePx}px`,
                     color: '#FFFFFF',
                     fontStyle: 'italic',
                     textShadow: '0 1px 2px rgba(0,0,0,0.6), 0 0 8px rgba(0,0,0,0.35)',
@@ -287,8 +304,10 @@ export const ResultPage: React.FC<ResultPageProps> = ({
                     letterSpacing: '0.8px',
                     fontWeight: 500
                   }}>
-                    @{userName} {regionEmoji}
-                  </span>
+                        @{userName} {regionEmoji}
+                      </span>
+                    );
+                  })()}
                 </div>
               );
             })()}
