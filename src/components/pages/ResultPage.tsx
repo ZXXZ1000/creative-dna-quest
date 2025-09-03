@@ -62,15 +62,17 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   // 根据结果类型获取对应的背景图片
   const getBackgroundImage = () => {
     const imageMap: Record<string, string> = {
-      'MAKER': '/assets/result page/BULIDER.png',
-      'TIDY': '/assets/result page/ORGANIZER.png',
-      'ILLUMA': '/assets/result page/LIGHT SEEKER.png',
-      'REFORM': '/assets/result page/INNIVATOR.png',
-      'NOMAD': '/assets/result page/EXPLORER.png',
-      'VISUAL': '/assets/result page/CRAFTER.png'
+      'MAKER': '/assets/result-images/BULIDER.png',
+      'TIDY': '/assets/result-images/ORGANIZER.png',
+      'ILLUMA': '/assets/result-images/LIGHT-SEEKER.png',
+      'REFORM': '/assets/result-images/INNIVATOR.png',
+      'NOMAD': '/assets/result-images/EXPLORER.png',
+      'VISUAL': '/assets/result-images/CRAFTER.png'
     };
     
-    return imageMap[result?.type || 'MAKER'] || '/assets/result page/BULIDER.png';
+    const imagePath = imageMap[result?.type || 'MAKER'] || '/assets/result-images/BULIDER.png';
+    console.log('Attempting to load image:', imagePath, 'for result type:', result?.type);
+    return imagePath;
   };
 
   // 动态计算图片尺寸和容器高度
