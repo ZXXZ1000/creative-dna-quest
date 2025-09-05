@@ -10,7 +10,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const [showScienceModal, setShowScienceModal] = useState(false);
 
   return (
-    <div className="h-screen w-full relative overflow-hidden" style={{ 
+    <div className="h-full w-full relative overflow-hidden" style={{ 
       backgroundColor: '#ECECEC'
     }}>
       {/* Bottom-layer Background Image */}

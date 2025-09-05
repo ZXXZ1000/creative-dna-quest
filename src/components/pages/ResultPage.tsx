@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useCanvas } from '../../contexts/CanvasContext';
 import html2canvas from 'html2canvas';
 import { Logo } from '../../components/Logo';
 import { CreativeProfile } from '../../types/test';
@@ -35,6 +36,9 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   
   const regionEmoji = userRegion ? (regionToEmoji[userRegion] || "🌍") : "";
   const exportRef = useRef<HTMLDivElement>(null);
+
+  // Canvas size from fixed 9:18 wrapper
+  const { width: canvasWidth, height: canvasHeight } = useCanvas();
 
   // 图片尺寸状态管理
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -99,7 +103,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
       const imageSrc = getBackgroundImage();
       
       img.onload = () => {
-        const windowWidth = window.innerWidth;
+        const windowWidth = canvasWidth || window.innerWidth;
         const imageAspectRatio = img.naturalHeight / img.naturalWidth;
         
         // 计算图片在当前窗口宽度下的显示高度
@@ -121,7 +125,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
         });
         
         // 计算合适的滑动窗口高度
-        const windowHeight = window.innerHeight;
+        const windowHeight = canvasHeight || window.innerHeight;
         const availableHeight = windowHeight - 80 - 80; // 40px top margin + 40px bottom space for buttons
         const scrollHeight = Math.min(displayHeight, availableHeight);
         
@@ -132,7 +136,8 @@ export const ResultPage: React.FC<ResultPageProps> = ({
       img.onerror = () => {
         console.error('Failed to load image:', imageSrc);
         // 使用默认尺寸
-        setContainerHeight(window.innerHeight * 1.5);
+        const fallbackH = canvasHeight || window.innerHeight;
+        setContainerHeight(fallbackH * 1.5);
         setScrollWindowHeight('76vh');
         setImageLoaded(true);
       };
@@ -147,13 +152,13 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     // 监听窗口大小变化
     const handleResize = () => {
       if (imageDimensions.width && imageDimensions.height) {
-        const windowWidth = window.innerWidth;
+        const windowWidth = canvasWidth || window.innerWidth;
         const imageAspectRatio = imageDimensions.height / imageDimensions.width;
         const displayHeight = windowWidth * imageAspectRatio;
         
         setContainerHeight(displayHeight);
         
-        const windowHeight = window.innerHeight;
+        const windowHeight = canvasHeight || window.innerHeight;
         const availableHeight = windowHeight - 80 - 80;
         const scrollHeight = Math.min(displayHeight, availableHeight);
         
@@ -166,7 +171,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [result, imageDimensions.width, imageDimensions.height]);
+  }, [result, imageDimensions.width, imageDimensions.height, canvasWidth, canvasHeight]);
 
   // 导出图片功能
   const handleSaveResult = async () => {
@@ -201,7 +206,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   };
 
   return (
-    <div className="h-screen w-full relative bg-white">
+    <div className="h-full w-full relative bg-white">
       {/* Loading State */}
       {!imageLoaded && (
         <div className="absolute inset-0 flex items-center justify-center">

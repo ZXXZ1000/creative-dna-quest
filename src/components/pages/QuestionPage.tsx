@@ -264,8 +264,8 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
   // Typing timing configuration (apply to all questions)
   const isQ1 = questionNumber === 1;
-  const typingSpeedMs = 90; // ms per char
-  const lineGapMs = 180; // pause between lines
+  const typingSpeedMs = 45; // ms per char (faster)
+  const lineGapMs = 100; // shorter pause between lines
   const l1Chars = questionLines.line1?.text.length || 0;
   const l2Chars = questionLines.line2?.text.length || 0;
   const l3Chars = questionLines.line3?.text.length || 0;
@@ -398,7 +398,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   };
 
   return (
-    <div className={`h-screen w-full relative overflow-hidden bg-white`}>
+    <div className={`h-full w-full relative overflow-hidden bg-white`}>
       {/* 主视图：保留页面整体入场/退出动画（不影响进度条）*/}
       <div className={`relative h-full transition-all duration-700 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

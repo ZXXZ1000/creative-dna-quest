@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { useTestState } from '../hooks/useTestState';
 import { questions, creativeProfiles } from '../data/questions';
 import { LandingPage } from './pages/LandingPage';
@@ -136,8 +135,7 @@ export const CreativeDNATest: React.FC = () => {
 
   if (isDebugBuilder) {
     return (
-      <div className="min-h-screen overflow-hidden">
-        {/* 固定进度条隐藏（调试结果页不需要） */}
+      <div className="h-full overflow-hidden">
         <ResultPage
           result={creativeProfiles.MAKER}
           userName={state.userInfo.name || 'Debug User'}
@@ -150,11 +148,10 @@ export const CreativeDNATest: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden">
-      {/* 固定在视口顶部的进度条（仅在题目页面显示），保留平滑推进动画 */}
-      {typeof document !== 'undefined' && isQuestionPage && createPortal(
+    <div className="h-full overflow-hidden relative">
+      {isQuestionPage && (
         <div
-          className="fixed top-0 left-0 right-0 z-50"
+          className="absolute top-0 left-0 right-0 z-50"
           style={{ paddingTop: 'calc(16px + env(safe-area-inset-top))' }}
         >
           <div className="px-6 pb-2">
@@ -169,8 +166,7 @@ export const CreativeDNATest: React.FC = () => {
               />
             </div>
           </div>
-        </div>,
-        document.body
+        </div>
       )}
 
       <SwipePageContainer

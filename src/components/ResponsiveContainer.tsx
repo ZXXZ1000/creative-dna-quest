@@ -48,7 +48,7 @@ export const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({
         }
       : {
           width: '100%',
-          height: '100dvh',
+          height: '100%',
           position: 'relative',
         };
 

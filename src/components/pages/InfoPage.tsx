@@ -94,7 +94,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your name"
                 maxLength={20}
-                className={`w-full px-4 py-3 rounded-xl border-2 bg-white transition-all
+                className={`w-full px-4 py-3 rounded-xl border-2 bg-white transition-all text-black
                   ${errors.name 
                     ? 'border-red-400 focus:border-red-500' 
                     : 'border-gray-200 focus:border-yellow-400'
@@ -117,7 +117,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className={`w-full px-4 py-3 rounded-xl border-2 bg-white transition-all
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white transition-all text-black
                 ${errors.email 
                   ? 'border-red-400 focus:border-red-500' 
                   : 'border-gray-200 focus:border-yellow-400'

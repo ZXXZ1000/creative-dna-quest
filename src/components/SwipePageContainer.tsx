@@ -22,11 +22,11 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
   const velocityRef = useRef(0);
   const lastTimeRef = useRef(0);
 
-  // 获取更准确的可视高度（支持移动端浏览器地址栏动态变化）
-  const getViewportHeight = () => window.visualViewport?.height ?? window.innerHeight;
+  // 改为基于容器高度进行计算，避免依赖视口
+  const getContainerHeight = () => containerRef.current?.clientHeight ?? (window.visualViewport?.height ?? window.innerHeight);
 
-  // 滑动阈值（基于可视高度）
-  const threshold = getViewportHeight() * 0.25; // 降低阈值，更容易滑动
+  // 滑动阈值（基于容器高度）
+  const threshold = getContainerHeight() * 0.25; // 降低阈值，更容易滑动
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!enableSwipe || isTransitioning) return;
@@ -53,13 +53,13 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
 
     const offset = touch.clientY - startYRef.current;
     
-    // 滑动范围（基于可视高度）
-    const maxOffset = getViewportHeight() * 0.5; // 减小最大滑动距离
+    // 滑动范围（基于容器高度）
+    const maxOffset = getContainerHeight() * 0.5; // 减小最大滑动距离
     let finalOffset = Math.max(-maxOffset, Math.min(maxOffset, offset));
     
     // 更柔和的边界阻尼效果
     const dampingStrength = 0.25;
-    const boundaryThreshold = getViewportHeight() * 0.15;
+    const boundaryThreshold = getContainerHeight() * 0.15;
     
     // 在第一页向下滑动时添加阻尼
     if (currentIndex === 0 && finalOffset > 0) {
@@ -144,7 +144,7 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
   }, [currentIndex, isDragging, isTransitioning]);
 
   const getTransform = (index: number) => {
-    const baseTranslateY = (index - currentIndex) * getViewportHeight();
+    const baseTranslateY = (index - currentIndex) * getContainerHeight();
     const currentOffset = isDragging ? dragOffset : 0;
     
     return `translateY(${baseTranslateY + currentOffset}px)`;
@@ -158,14 +158,14 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-[100dvh] overflow-hidden touch-none"
+      className="relative w-full h-full overflow-hidden touch-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{ 
         touchAction: 'none',
         background: '#ffffff',
-        height: '100dvh' // 作为 Tailwind h-[100dvh] 的内联兜底
+        height: '100%'
       }}
     >
       {children.map((child, index) => (
