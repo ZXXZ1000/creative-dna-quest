@@ -400,13 +400,13 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   return (
     <div className={`h-full w-full relative overflow-hidden bg-white`}>
       {/* 主视图：保留页面整体入场/退出动画（不影响进度条）*/}
-      <div className={`relative h-full transition-all duration-700 ${
+      <div className={`relative h-full transition-all duration-700 isolate ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`} style={{ paddingTop: 'calc(56px + env(safe-area-inset-top))' }}>
 
       {/* 右上角ASCII艺术背景（Q3/4/5/8 进一步下移；Q8 缩小） */}
       <div 
-        className={`absolute right-0 z-0 question-ascii-right ${
+        className={`absolute right-0 pointer-events-none z-[-1] question-ascii-right ${
           isVisible ? getImageAnimationClass('right', questionNumber) : 'opacity-0 translate-x-8'
         }`}
         style={{ 
@@ -428,7 +428,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
 
       {/* 左下角黄色ASCII艺术装饰（整体下移并缩小） */}
       <div 
-        className={`absolute bottom-40 left-0 z-0 question-ascii-left ${
+        className={`absolute bottom-40 left-0 pointer-events-none z-[-1] question-ascii-left ${
           isVisible ? getImageAnimationClass('left', questionNumber) : 'opacity-0 translate-y-8'
         }`}
         style={{ 
@@ -444,7 +444,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
       </div>
 
       {/* 主内容区域 */}
-      <div className="relative z-10 px-6">
+      <div className="relative z-20 transform-gpu px-6">
         {/* 问题标题：所有题目统一使用打字机动画 */}
         <div className="mt-16 mb-12">
           {questionLines.line1 && (

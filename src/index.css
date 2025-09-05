@@ -770,6 +770,13 @@
     image-rendering: crisp-edges;
   }
 
+  /* iOS Safari compositing workaround: reduce filters on decorative images */
+  @supports (-webkit-touch-callout: none) {
+    .deco-yellow, .deco-black {
+      filter: none !important;
+    }
+  }
+
   /* Landing start button: 响应式缩放避免横屏过大 */
   .landing-start .landing-start-btn {
     font-size: clamp(16px, calc(18px * var(--responsive-scale)), 20px);
