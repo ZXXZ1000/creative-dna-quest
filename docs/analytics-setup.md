@@ -22,11 +22,16 @@ Data Model (events)
 - url/referrer/user_agent/language/timezone: context
 - viewport (jsonb): { w, h, dpr }
 - utm (jsonb): utm_source/medium/campaign/content/term/lid
-- props (jsonb): event-specific payload
+- props (jsonb): event-specific payload. Examples:
+  - info_submitted: { name, email, region, emailSubscription }
+  - question_answered: { question_id, option_id, scores: { MAKER, TIDY, ILLUMA, REFORM, NOMAD, VISUAL } }
+  - result_computed: { result_type }
+  - save_result_success: { result_type, width, height }
+  - IP: captured automatically into `events.ip` by database trigger
 
 Export
 - One-row-per-user summary: `public.v_user_summary` (recommended for handoff)
-  - Includes first_seen, last_seen, answered count, latest info (name, email_hash, region, subscription) and result_type, plus UTM/link.
+  - Includes first_seen, last_seen, answered count、每道题的最新选项(q1~q8)、6类型累计得分(score_*)、最新 info（name、email、region、subscription）、result_type、UTM/link、是否保存结果(saved_result)。
   - Export from Dashboard: Table editor → Views → v_user_summary → Export → CSV.
 - Raw events flat view: `public.v_events_flat` for deep dives.
   Example SQL:

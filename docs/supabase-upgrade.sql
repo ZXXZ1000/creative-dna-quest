@@ -1,61 +1,37 @@
--- Supabase schema for Creative DNA analytics (minimal viable)
+-- Upgrade existing schema to latest analytics shape
+-- Safe to run multiple times (idempotent where possible)
 
-create table if not exists public.events (
-  id bigserial primary key,
-  event_id uuid not null unique,
-  session_id uuid not null,
-  name text not null,
-  ts timestamptz not null,
-  url text,
-  referrer text,
-  user_agent text,
-  language text,
-  timezone text,
-  viewport jsonb,
-  utm jsonb,
-  props jsonb,
-  received_at timestamptz not null default now()
-);
+-- 1) Add IP column if missing
+do $$ begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'events' and column_name = 'ip'
+  ) then
+    alter table public.events add column ip inet;
+  end if;
+end $$;
 
--- Recommended index
-create index if not exists idx_events_session on public.events (session_id);
-create index if not exists idx_events_name_ts on public.events (name, ts desc);
+-- 2) Trigger to set IP from x-forwarded-for
+create or replace function public.set_request_ip()
+returns trigger language plpgsql as $$
+begin
+  if NEW.ip is null then
+    begin
+      NEW.ip := nullif(split_part((current_setting('request.headers', true)::json->>'x-forwarded-for'), ',', 1),'')::inet;
+    exception when others then
+      NEW.ip := null;
+    end;
+  end if;
+  return NEW;
+end $$;
 
--- Enable RLS, allow anonymous inserts only
-alter table public.events enable row level security;
+drop trigger if exists trg_set_ip on public.events;
+create trigger trg_set_ip before insert on public.events
+for each row execute function public.set_request_ip();
 
-drop policy if exists "allow_insert_anon" on public.events;
-create policy "allow_insert_anon" on public.events
-  for insert
-  to anon
-  with check (true);
-
--- Optional: deny select to anon (keep analytics private)
-revoke all on public.events from anon;
-grant insert on public.events to anon;
-
--- Optionally create a view for export (flatten common fields)
-create or replace view public.v_events_flat as
-  select
-    id,
-    event_id,
-    session_id,
-    name,
-    ts,
-    (utm ->> 'utm_source') as utm_source,
-    (utm ->> 'utm_medium') as utm_medium,
-    (utm ->> 'utm_campaign') as utm_campaign,
-    (utm ->> 'lid') as link_id,
-    url,
-    referrer,
-    (viewport ->> 'w')::int as viewport_w,
-    (viewport ->> 'h')::int as viewport_h,
-    (viewport ->> 'dpr')::numeric as dpr,
-    props
-  from public.events;
-
--- One-row-per-user(session) summary view
-create or replace view public.v_user_summary as
+-- Drop old view to avoid column-rename conflicts, then recreate
+drop view if exists public.v_user_summary;
+create view public.v_user_summary as
 with base as (
   select
     session_id,
@@ -73,7 +49,7 @@ info as (
   select distinct on (session_id)
     session_id,
     props->>'name' as name,
-    props->>'email' as email,
+    coalesce(props->>'email', props->>'email_hash') as email,
     (props->>'region') as region,
     coalesce((props->>'emailSubscription')::boolean, (props->>'email_subscription')::boolean) as email_subscription,
     ts as info_ts
@@ -138,10 +114,7 @@ select
   a.q1_option, a.q2_option, a.q3_option, a.q4_option, a.q5_option, a.q6_option, a.q7_option, a.q8_option,
   s.score_maker, s.score_tidy, s.score_illuma, s.score_reform, s.score_nomad, s.score_visual,
   exists (select 1 from public.events e where e.session_id = b.session_id and e.name = 'save_result_success') as saved_result,
-  b.link_id,
-  b.utm_source,
-  b.utm_medium,
-  b.utm_campaign
+  b.link_id, b.utm_source, b.utm_medium, b.utm_campaign
 from base b
 left join info i using (session_id)
 left join result r using (session_id)
@@ -149,28 +122,3 @@ left join answers a using (session_id)
 left join score_sum s using (session_id)
 left join q using (session_id)
 order by b.first_seen desc;
-
--- Add IP column and trigger to capture from x-forwarded-for
-do $$ begin
-  if not exists (
-    select 1 from information_schema.columns where table_schema = 'public' and table_name = 'events' and column_name = 'ip'
-  ) then
-    alter table public.events add column ip inet;
-  end if;
-end $$;
-
-create or replace function public.set_request_ip()
-returns trigger language plpgsql as $$
-begin
-  if NEW.ip is null then
-    begin
-      NEW.ip := nullif(split_part((current_setting('request.headers', true)::json->>'x-forwarded-for'), ',', 1),'')::inet;
-    exception when others then
-      NEW.ip := null;
-    end;
-  end if;
-  return NEW;
-end $$;
-
-drop trigger if exists trg_set_ip on public.events;
-create trigger trg_set_ip before insert on public.events for each row execute function public.set_request_ip();

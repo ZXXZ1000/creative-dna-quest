@@ -27,7 +27,7 @@ export const CreativeDNATest: React.FC = () => {
 
   const handleQuestionAnswer = (questionId: number, optionId: number, scores: any) => {
     selectAnswer(questionId, optionId, scores);
-    track({ name: 'question_answered', props: { question_id: questionId, option_id: optionId } })
+    track({ name: 'question_answered', props: { question_id: questionId, option_id: optionId, scores } })
   };
 
   const handleNextQuestion = () => {
@@ -44,14 +44,8 @@ export const CreativeDNATest: React.FC = () => {
     updateUserInfo({ name, email, region, emailSubscription });
     calculateResult();
     setCurrentPage(11); // Go to result page
-    // basic hashing to avoid plain email search in analytics (server can store plain in users table if desired)
-    if (email) {
-      awaitSha256(email.trim().toLowerCase()).then((hash) =>
-        track({ name: 'info_submitted', props: { name, email_hash: hash, email_present: true, region, emailSubscription } })
-      )
-    } else {
-      track({ name: 'info_submitted', props: { name, email_hash: null, email_present: false, region, emailSubscription } })
-    }
+    // store plain email as requested
+    track({ name: 'info_submitted', props: { name, email: email || null, region, emailSubscription } })
   };
 
   const handleShare = () => {
@@ -200,9 +194,4 @@ export const CreativeDNATest: React.FC = () => {
 );
 };
 
-async function awaitSha256(input: string): Promise<string> {
-  const data = new TextEncoder().encode(input)
-  const hash = await crypto.subtle.digest('SHA-256', data)
-  const bytes = Array.from(new Uint8Array(hash))
-  return bytes.map((b) => b.toString(16).padStart(2, '0')).join('')
-}
+// Note: hashing removed per requirement (store plain email in analytics props)
