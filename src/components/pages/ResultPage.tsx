@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useCanvas } from '../../contexts/CanvasContext';
 import html2canvas from 'html2canvas';
+import { track } from '../../lib/analytics';
 import { Logo } from '../../components/Logo';
 import { CreativeProfile } from '../../types/test';
 
@@ -199,6 +200,11 @@ export const ResultPage: React.FC<ResultPageProps> = ({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      // Track success with basic metrics
+      try {
+        track({ name: 'save_result_success', props: { result_type: result?.type, width: canvas.width, height: canvas.height } })
+      } catch {}
     } catch (error) {
       console.error('导出图片失败:', error);
       alert('导出失败，请重试');

@@ -6,6 +6,7 @@ import { QuestionPage } from './pages/QuestionPage';
 import { InfoPage } from './pages/InfoPage';
 import { ResultPage } from './pages/ResultPage';
 import { SwipePageContainer } from './SwipePageContainer';
+import { track, trackLinkOpenedOnce } from '../lib/analytics';
 
 export const CreativeDNATest: React.FC = () => {
   const {
@@ -21,10 +22,12 @@ export const CreativeDNATest: React.FC = () => {
 
   const handleStartTest = () => {
     setCurrentPage(2); // Go directly to first question
+    track({ name: 'start_test' })
   };
 
   const handleQuestionAnswer = (questionId: number, optionId: number, scores: any) => {
     selectAnswer(questionId, optionId, scores);
+    track({ name: 'question_answered', props: { question_id: questionId, option_id: optionId } })
   };
 
   const handleNextQuestion = () => {
@@ -41,6 +44,14 @@ export const CreativeDNATest: React.FC = () => {
     updateUserInfo({ name, email, region, emailSubscription });
     calculateResult();
     setCurrentPage(11); // Go to result page
+    // basic hashing to avoid plain email search in analytics (server can store plain in users table if desired)
+    if (email) {
+      awaitSha256(email.trim().toLowerCase()).then((hash) =>
+        track({ name: 'info_submitted', props: { name, email_hash: hash, email_present: true, region, emailSubscription } })
+      )
+    } else {
+      track({ name: 'info_submitted', props: { name, email_hash: null, email_present: false, region, emailSubscription } })
+    }
   };
 
   const handleShare = () => {
@@ -133,6 +144,13 @@ export const CreativeDNATest: React.FC = () => {
     ? Math.min(Math.max(((questionIndex + 1) / questions.length) * 100, 0), 100)
     : 0;
 
+  // Track when result is available
+  useEffect(() => {
+    if (state.result) {
+      track({ name: 'result_computed', props: { result_type: state.result.type } })
+    }
+  }, [state.result])
+
   if (isDebugBuilder) {
     return (
       <div className="h-full overflow-hidden">
@@ -146,6 +164,8 @@ export const CreativeDNATest: React.FC = () => {
       </div>
     );
   }
+
+  useEffect(() => { trackLinkOpenedOnce() }, [])
 
   return (
     <div className="h-full overflow-hidden relative">
@@ -177,5 +197,12 @@ export const CreativeDNATest: React.FC = () => {
         {allPages}
       </SwipePageContainer>
     </div>
-  );
+);
 };
+
+async function awaitSha256(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input)
+  const hash = await crypto.subtle.digest('SHA-256', data)
+  const bytes = Array.from(new Uint8Array(hash))
+  return bytes.map((b) => b.toString(16).padStart(2, '0')).join('')
+}
