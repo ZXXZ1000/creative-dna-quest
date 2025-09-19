@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { SimplePageContainer } from '../SimplePageContainer';
 import { Logo } from '../../components/Logo';
+import { countries } from '../../data/countries';
+import { flagEmojiForName } from '../../lib/flagEmoji';
+import { CountrySelect } from '../CountrySelect';
 
 interface InfoPageProps {
   onContinue: (name: string, email: string, region: string, emailSubscription: boolean) => void;
@@ -18,7 +21,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
   const [region, setRegion] = useState(initialData?.region || '');
   const [emailSubscription, setEmailSubscription] = useState(initialData?.emailSubscription ?? true);
   const [errors, setErrors] = useState<{ name?: string; email?: string; region?: string }>({});
-  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+  // Email is optional; no prompt modal is shown when omitted
 
   const validate = () => {
     const newErrors: { name?: string; email?: string; region?: string } = {};
@@ -46,23 +49,11 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
   const handleSubmit = () => {
     if (!validate()) return;
     
-    if (!email.trim()) {
-      setShowEmailPrompt(true);
-      return;
-    }
-    
     onContinue(name.trim(), email.trim(), region, emailSubscription);
   };
+  
 
-  const handleSkipEmail = () => {
-    onContinue(name.trim(), '', region, emailSubscription);
-    setShowEmailPrompt(false);
-  };
-
-  const regions = [
-    'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Australia',
-    'Japan', 'China', 'South Korea', 'Singapore', 'Other'
-  ];
+  const regions = countries;
 
   return (
     <SimplePageContainer>
@@ -71,7 +62,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
         <div className="space-y-2 animate-scale-in">
           {/* HOTO Logo - 左上角定位（替换文字为图片组件） */}
           <div className="mb-8 text-left">
-            <Logo src="/assets/logos/logo.jpg" alt="HOTO Logo" height={24} />
+            <Logo src={(import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}assets/logos/logo.jpg` : '/assets/logos/logo.jpg'} alt="HOTO Logo" height={24} />
           </div>
           {/* 标题居中 */}
           <div className="text-center">
@@ -131,24 +122,15 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             </p>
           </div>
 
-          {/* Region Select */}
+          {/* Region Select (custom dropdown with fixed height and A–Z index) */}
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-800">Country/Region</label>
-            <select
+            <CountrySelect
               value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className={`w-full px-4 py-3 rounded-xl border-2 bg-white transition-all text-gray-900
-                ${errors.region 
-                  ? 'border-red-400 focus:border-red-500' 
-                  : 'border-gray-200 focus:border-yellow-400'
-                } focus:outline-none`}
-              style={{ color: region ? '#111827' : '#6B7280' }}
-            >
-              <option value="" className="text-gray-600">Select Country/Region</option>
-              {regions.map(r => (
-                <option key={r} value={r} className="text-gray-900">{r}</option>
-              ))}
-            </select>
+              onChange={setRegion}
+              options={regions}
+              placeholder="Select Country/Region"
+            />
             {errors.region && (
               <p className="text-red-500 text-sm mt-1">{errors.region}</p>
             )}
@@ -168,35 +150,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
           </button>
         </div>
 
-        {/* Email Prompt Modal */}
-        {showEmailPrompt && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white p-6 rounded-2xl max-w-sm w-full border border-gray-200 animate-scale-in">
-              <div className="text-center space-y-4">
-                <div className="text-4xl">🎁</div>
-                <h3 className="text-lg font-semibold">Don't miss out!</h3>
-                <p className="text-sm text-gray-800">
-                  Add your email to receive your personalized Creative DNA results and future creative inspiration!
-                </p>
-                <div className="space-y-3 pt-2">
-                  <button 
-                    onClick={() => setShowEmailPrompt(false)}
-                    className="w-full text-black font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:brightness-95"
-                    style={{ backgroundColor: '#FFED00' }}
-                  >
-                    I'll add my email
-                  </button>
-                  <button 
-                    onClick={handleSkipEmail}
-                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-3 px-6 rounded-xl transition-all duration-300"
-                  >
-                    Skip for now
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Email prompt removed */}
       </div>
     </SimplePageContainer>
   );

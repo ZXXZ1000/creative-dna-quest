@@ -7,6 +7,7 @@ import { InfoPage } from './pages/InfoPage';
 import { ResultPage } from './pages/ResultPage';
 import { SwipePageContainer } from './SwipePageContainer';
 import { track, trackLinkOpenedOnce } from '../lib/analytics';
+import { AudioController } from './AudioController';
 
 export const CreativeDNATest: React.FC = () => {
   const {
@@ -163,6 +164,7 @@ export const CreativeDNATest: React.FC = () => {
 
   return (
     <div className="h-full overflow-hidden relative">
+      <AudioController />
       {isQuestionPage && (
         <div
           className="absolute top-0 left-0 right-0 z-50"
@@ -171,11 +173,11 @@ export const CreativeDNATest: React.FC = () => {
           <div className="px-6 pb-2">
             <div className="rounded-full" style={{ height: '6px', backgroundColor: '#6c6a6aff', width: '90%', margin: '0 auto' }}>
               <div
-                className="h-full rounded-full transition-[width] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                className="h-full rounded-full transition-[width]"
                 style={{
                   width: `${progress}%`,
                   backgroundColor: '#FFED00',
-                  transition: 'width 1.4s cubic-bezier(0.22, 1, 0.36, 1)'
+                  transition: 'width 1400ms cubic-bezier(0.22, 1, 0.36, 1)'
                 }}
               />
             </div>

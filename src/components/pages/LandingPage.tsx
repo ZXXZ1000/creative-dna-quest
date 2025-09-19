@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Logo } from '../../components/Logo';
+// Typing SFX removed per request
+import { primeTypingSfx } from '../../lib/typingSfx';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -11,23 +13,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
   return (
     <div className="h-full w-full relative overflow-hidden" style={{ 
-      backgroundColor: '#ECECEC'
+      // Top stays light gray, bottom transitions to white
+      background: 'linear-gradient(to bottom, #ECECEC 0%, #ECECEC 38%, #FFFFFF 38%, #FFFFFF 100%)'
     }}>
       {/* Bottom-layer Background Image */}
       <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
         <img
-          src="/assets/bg/group-45-2.png"
+          src={(import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}assets/bg/group-45-2.png` : '/assets/bg/group-45-2.png'}
           alt="Background"
           className="select-none"
           style={{
             width: '100%',
-            height: '100%',
+            height: 'auto',
+            maxHeight: '100%',
             objectFit: 'contain',
-            transform: 'scale(1) translateY(5vh)',
+            // align to page width without overscaling
+            transform: 'translateY(calc(20px * var(--responsive-scale)))',
             transformOrigin: 'center center'
           }}
         />
       </div>
+      
+
       {/* ASCII Art Background - 与页面相似尺寸，居中自适应 */}
       <div 
         className="absolute inset-0 z-0 animate-ascii-fade-center landing-ascii-bg"
@@ -39,14 +46,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         }}
       >
         <img 
-          src="/ascii-art.png" 
+          src={(import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}ascii-art.png` : '/ascii-art.png'} 
           alt="ASCII Art Background" 
           className="opacity-70 select-none"
           style={{
-            width: 'min(100vmin, 100vw)',
-            height: 'min(100vmin, 100dvh)',
+            width: '100%',
+            height: 'auto',
+            maxHeight: '100%',
             objectFit: 'contain',
-            transform: 'translateY(25dvh) scale(2)',
+            // move a bit further down compared to previous state
+            transform: 'translateY(calc(160px * var(--responsive-scale))) scale(1)',
             transformOrigin: 'center center'
           }}
         />
@@ -56,12 +65,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       
       {/* HOTO Brand Logo (top-left) */}
       <div className="absolute z-10" style={{
-        top: 'calc(3rem * var(--responsive-scale) + env(safe-area-inset-top))',
+        top: 'calc(1rem * var(--responsive-scale) + env(safe-area-inset-top))',
         left: 'calc(1rem * var(--responsive-scale))'
       }}>
         {/* Use transparent-processed logo */}
         <Logo
-          src="/assets/logos/logo.jpg"
+          src={(import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}assets/logos/logo.jpg` : '/assets/logos/logo.jpg'}
           alt="HOTO Logo"
           className="animate-fade-in"
           height={'calc(1.5rem * var(--responsive-scale))'}
@@ -70,33 +79,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
 
       {/* Main Content Area */}
       <div className="relative z-10" style={{
-        paddingLeft: 'calc(1.5rem * var(--responsive-scale))',
-        paddingRight: 'calc(1.5rem * var(--responsive-scale))',
-        marginTop: 'calc(12rem * var(--responsive-scale))',
+        paddingLeft: 'calc(1.25rem * var(--responsive-scale))',
+        paddingRight: 'calc(1.25rem * var(--responsive-scale))',
+        marginTop: 'calc(11.5rem * var(--responsive-scale))',
         gap: 'calc(0.5rem * var(--responsive-scale))',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        alignItems: 'center',
       }}>
         {/* Creative Philosophy Quotes */}
         <div className="text-center space-y-1 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="grid grid-cols-1 gap-1 max-w-xs mx-auto">
-            <div className="text-left">
+          <div 
+            className="grid grid-cols-2 mx-auto"
+            style={{ 
+              maxWidth: 'calc(320px * var(--responsive-scale))',
+              columnGap: 'calc(6px * var(--responsive-scale))',
+              gridTemplateRows: 'auto auto',
+              rowGap: 'calc(0px * var(--responsive-scale))'
+            }}
+          >
+            <div className="text-left" style={{ gridColumn: 1, gridRow: 1 }}>
               <p className="text-gray-500" style={{ 
                 fontFamily: 'RM Neue, sans-serif',
                 fontWeight: 300,
                 fontStyle: 'italic',
-                fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)'
+                fontSize: 'calc(16px * var(--responsive-scale))'
               }}>
                 Some tinker endlessly.<br />
                 Others design first.
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-right" style={{ gridColumn: 2, gridRow: 2 }}>
               <p className="text-gray-500" style={{ 
                 fontFamily: 'RM Neue, sans-serif',
                 fontWeight: 300,
                 fontStyle: 'italic',
-                fontSize: 'clamp(1.1rem, 3.5vw, 1.4rem)'
+                fontSize: 'calc(16px * var(--responsive-scale))'
               }}>
                 Some crave order.<br />
                 Others thrive in chaos.
@@ -106,12 +124,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
 
         {/* Main Title */}
-        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s', marginTop: '1vh' }}>
+        <div className="text-center animate-fade-in" style={{ animationDelay: '0.5s', marginTop: 'calc(6px * var(--responsive-scale))', maxWidth: 'calc(320px * var(--responsive-scale))' }}>
           <h1 className="text-black leading-tight" style={{
-            fontSize: 'clamp(2.8rem, 10vw, 4.2rem)',
+            // further reduced to enforce two fixed lines
+            fontSize: 'calc(44px * var(--responsive-scale))',
             fontFamily: 'RM Neue, sans-serif',
             fontWeight: 900,
-            fontStyle: 'italic'
+            fontStyle: 'italic',
+            lineHeight: 1.1,
+            margin: 0
           }}>
             What's Your<br />
             Creative Gene?
@@ -119,9 +140,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </div>
         
         {/* Subtitle */}
-        <div className="text-center animate-fade-in" style={{ animationDelay: '0.7s', marginTop: '0.5vh' }}>
+        <div className="text-center animate-fade-in" style={{ animationDelay: '0.7s', marginTop: 'calc(6px * var(--responsive-scale))' }}>
           <p className="text-gray-600" style={{
-            fontSize: 'clamp(1.25rem, 4.5vw, 1.4rem)',
+            fontSize: 'calc(16px * var(--responsive-scale))',
             fontFamily: 'RM Neue, sans-serif',
             fontWeight: 600,
             fontStyle: 'italic',
@@ -137,13 +158,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       
       {/* START TEST Button - 响应式 */}
       <div className="absolute left-1/2 transform -translate-x-1/2 animate-button-slide-up z-10 landing-start" style={{ 
-        bottom: 'calc(8rem * var(--responsive-scale) + env(safe-area-inset-bottom))',
+        bottom: 'calc(9.5rem * var(--responsive-scale) + env(safe-area-inset-bottom))',
         animationDelay: '1.2s' 
       }}>
         <img 
           src="/start-test-button.png"
           alt="START TEST"
           onClick={() => {
+            // 在用户手势内预解锁打字机音效，提升 iOS 播放成功率
+            try { primeTypingSfx(); } catch {}
             if (!agreementChecked) {
               // Show custom alert modal instead of browser alert
               const alertDiv = document.createElement('div');
@@ -172,22 +195,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               ? 'cursor-pointer' 
               : 'cursor-not-allowed opacity-50'
           }`}
-          style={{ 
-            filter: agreementChecked ? 'none' : 'grayscale(100%)'
-          }}
+          style={{ filter: agreementChecked ? 'none' : 'grayscale(100%)' }}
         />
       </div>
       
       {/* Test Info */}
-      <div className="absolute left-0 right-0 flex justify-center animate-text-fade-up z-10 landing-testinfo" style={{ 
-        bottom: 'calc(6rem * var(--responsive-scale) + env(safe-area-inset-bottom))',
+      <div className="absolute left-0 right-0 flex justify-center animate-text-fade-up z-20 landing-testinfo" style={{ 
+        bottom: 'calc(7.5rem * var(--responsive-scale) + env(safe-area-inset-bottom))',
         animationDelay: '1.4s' 
       }}>
         <p className="text-gray-600 r-text-sm font-medium font-rm">8 questions • 1 minute</p>
       </div>
       
       {/* Bottom Elements - 响应式居中 */}
-      <div className="absolute left-0 right-0 flex justify-center z-10 landing-bottombar" style={{
+      <div className="absolute left-0 right-0 flex justify-center z-20 landing-bottombar" style={{
         bottom: 'calc(2rem * var(--responsive-scale) + env(safe-area-inset-bottom))'
       }}>
         <div className="flex flex-col items-center animate-text-fade-up" style={{ 
@@ -203,7 +224,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           </button>
           
           {/* Agreement Checkbox - Properly centered */}
-          <label className="flex items-center space-x-2 cursor-pointer">
+          <label 
+            className="flex items-center cursor-pointer"
+            style={{
+              columnGap: 'calc(6px * var(--responsive-scale))',
+              maxWidth: 'calc(320px * var(--responsive-scale))'
+            }}
+          >
             <div className="relative">
               <input 
                 type="checkbox" 
@@ -211,24 +238,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 onChange={(e) => setAgreementChecked(e.target.checked)}
                 className="sr-only"
               />
-              <div className={`border-2 border-gray-400 r-rounded transition-all ${
+              <div className={`border border-gray-400 r-rounded transition-all ${
                 agreementChecked ? 'bg-black border-black' : 'bg-white'
               }`} style={{
-                width: 'calc(1.25rem * var(--responsive-scale))',
-                height: 'calc(1.25rem * var(--responsive-scale))'
+                width: 'calc(12px * var(--responsive-scale))',
+                height: 'calc(12px * var(--responsive-scale))'
               }}>
                 {agreementChecked && (
                   <svg className="text-white mx-auto" fill="currentColor" viewBox="0 0 20 20" style={{
-                    width: 'calc(0.75rem * var(--responsive-scale))',
-                    height: 'calc(0.75rem * var(--responsive-scale))',
-                    marginTop: 'calc(0.125rem * var(--responsive-scale))'
+                    width: 'calc(8px * var(--responsive-scale))',
+                    height: 'calc(8px * var(--responsive-scale))',
+                    marginTop: '0'
                   }}>
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
               </div>
             </div>
-            <span className="text-gray-600 r-text-sm font-inter">Agree to terms</span>
+            <span 
+              className="text-gray-600 font-inter"
+              style={{
+                fontSize: 'calc(12px * var(--responsive-scale))',
+                lineHeight: 1.4,
+                display: 'inline-block',
+                textAlign: 'center'
+              }}
+            >
+              I agree to share my results for<br />HOTO's marketing activities.
+            </span>
           </label>
         </div>
       </div>
@@ -252,7 +289,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               height: 'clamp(65px, 12vh, 85px)'
             }}>
               <Logo
-                src="/assets/logos/logo.jpg"
+                src={(import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}assets/logos/logo.jpg` : '/assets/logos/logo.jpg'}
                 alt="HOTO Logo"
                 height={'clamp(20px, 5vw, 30px)'}
               />
@@ -287,9 +324,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               paddingBottom: 'clamp(2.5rem, 7vw, 4rem)',
               overflowY: 'auto'
             }}>
-              <h3 className="r-text-3xl font-light tracking-wide text-white font-rm" style={{
-                marginBottom: 'clamp(2rem, 6vw, 3rem)',
-                fontSize: 'clamp(1.8rem, 6vw, 2.2rem)'
+              <h3 className="r-text-3xl font-bold text-white font-rm" style={{
+                marginBottom: 'clamp(1.25rem, 4vw, 2rem)',
+                fontSize: 'clamp(1.25rem, 4vw, 1.5rem)'
               }}>
                 THE SCIENCE BEHIND
               </h3>
@@ -300,17 +337,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 flexDirection: 'column'
               }}>
                 <p className="text-white r-text-base font-rm" style={{
-                  fontSize: 'clamp(1rem, 3.5vw, 1.1rem)',
-                  lineHeight: '1.8'
+                  fontSize: 'clamp(0.98rem, 3vw, 1.06rem)',
+                  lineHeight: '1.8',
+                  fontWeight: 400
                 }}>
                   Based on decades of research in creativity psychology, this test identifies your unique creative DNA - the psychological patterns that drive how you approach making, building, and creating.
                 </p>
                 
                 <p className="text-white r-text-base font-rm" style={{
-                  fontSize: 'clamp(1rem, 3.5vw, 1.1rem)',
-                  lineHeight: '1.8'
+                  fontSize: 'clamp(0.98rem, 3vw, 1.06rem)',
+                  lineHeight: '1.8',
+                  fontWeight: 400
                 }}>
-                  Drawing from <strong className="text-white">Torrance Creative Thinking Test (1962)</strong> & <strong className="text-white">Gough Creative Personality Scale (1979)</strong>.
+                  Drawing from Torrance Creative Thinking Test (1962) & Gough Creative Personality Scale (1979).
                 </p>
               </div>
               
@@ -319,7 +358,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 marginBottom: 'clamp(2rem, 5vw, 3.5rem)'
               }}>
                 <p className="r-text-lg text-white" style={{
-                  fontSize: 'clamp(1.1rem, 4.5vw, 1.4rem)'
+                  fontSize: 'clamp(0.98rem, 3vw, 1.06rem)'
                 }}>Ready to discover your type?</p>
               </div>
             </div>

@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Question } from '../../types/test';
 import { questionImages } from '../../data/questionImages';
+import { assetUrl } from '../../lib/assetUrl';
+import { getTypingSfx } from '../../lib/typingSfx';
+import { isSafari } from '../../lib/isSafari';
+// Sound effect for typing removed per request
 
 interface QuestionPageProps {
   question: Question;
@@ -56,7 +60,7 @@ const TypewriterLine: React.FC<{
   return (
     <div className={className} style={style}>
       <span>{shown}</span>
-      {active && !done && <span className="typewriter-caret" aria-hidden="true" />}
+      {active && count > 0 && !done && <span className="typewriter-caret" aria-hidden="true" />}
     </div>
   );
 };
@@ -109,6 +113,11 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false); // 新增：控制退出动画
+  const typingLoopRef = useRef<HTMLAudioElement | null>(null);
+  const startIdRef = useRef<number | null>(null);
+  const stopIdRef = useRef<number | null>(null);
+  // Use JS-driven typewriter for all engines to avoid font overhang clipping
+  const TypeLineComponent = TypewriterLine;
 
   // 页面动画控制 - 实现流畅的进入和退出
   useEffect(() => {
@@ -299,6 +308,82 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
     }
   }, [isQ1, isCurrentPage, totalTypingMs]);
 
+  // Typing loop SFX: play continuously while the typewriter runs, truncate at end
+  useEffect(() => {
+    // cleanup helper
+    const stop = () => {
+      if (startIdRef.current) { window.clearTimeout(startIdRef.current); startIdRef.current = null; }
+      if (stopIdRef.current) { window.clearTimeout(stopIdRef.current); stopIdRef.current = null; }
+      if (typingLoopRef.current) {
+        try { typingLoopRef.current.pause(); } catch {}
+        try { typingLoopRef.current.currentTime = 0; } catch {}
+      }
+    };
+
+    stop();
+    if (!isCurrentPage) return;
+
+    if (!typingLoopRef.current) {
+      typingLoopRef.current = getTypingSfx();
+    }
+
+    const audio = typingLoopRef.current!;
+    // 确保从头播放
+    try { audio.currentTime = 0; } catch {}
+
+    const scheduleStopAfterPlay = () => {
+      // 以“实际开始播放的时刻”为基准，安排停止时间，避免 iOS 因手势延迟导致立即 stop
+      const delay = Math.max(120, totalTypingMs + 80);
+      if (stopIdRef.current) { window.clearTimeout(stopIdRef.current); }
+      stopIdRef.current = window.setTimeout(() => { stop(); }, delay);
+    };
+
+    // 若正在播放背景音乐，iOS 可混音；确保音量不刺耳
+    audio.volume = 0.12;
+    audio.loop = true;
+
+    const tryPlay = () => {
+      audio.play().then(() => {
+        scheduleStopAfterPlay();
+      }).catch(() => {
+        // iOS 自动播放限制：等待用户手势再启动
+        const once = () => {
+          audio.play().finally(() => {
+            scheduleStopAfterPlay();
+            window.removeEventListener('pointerdown', once);
+            window.removeEventListener('touchstart', once);
+          });
+        };
+        window.addEventListener('pointerdown', once, { once: true });
+        window.addEventListener('touchstart', once, { once: true });
+      });
+    };
+
+    startIdRef.current = window.setTimeout(tryPlay, 0);
+
+    // 页面不可见时立即停止，避免挂起后错过 stop 计时
+    const onVisibilityChange = () => { if (document.hidden) stop(); };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => { document.removeEventListener('visibilitychange', onVisibilityChange); stop(); };
+  }, [questionNumber, isCurrentPage, totalTypingMs]);
+
+  // Stop when exiting to next question
+  useEffect(() => {
+    if (isExiting) {
+      if (startIdRef.current) { window.clearTimeout(startIdRef.current); startIdRef.current = null; }
+      if (stopIdRef.current) { window.clearTimeout(stopIdRef.current); stopIdRef.current = null; }
+      if (typingLoopRef.current) {
+        try { typingLoopRef.current.pause(); } catch {}
+        try { typingLoopRef.current.currentTime = 0; } catch {}
+      }
+    }
+  }, [isExiting]);
+
+  // Typing click SFX scheduling removed per request
+
+  // 之前的键盘音效实现已移除：根据反馈不再在打字期间播放循环音轨
+
   // 根据问题编号获取动画主题
   const getAnimationTheme = (questionNum: number) => {
     const themes = {
@@ -400,13 +485,13 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
   return (
     <div className={`h-full w-full relative overflow-hidden bg-white`}>
       {/* 主视图：保留页面整体入场/退出动画（不影响进度条）*/}
-      <div className={`relative h-full transition-all duration-700 isolate ${
+      <div className={`relative h-full transition-all duration-700 isolate qpage-wrapper ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`} style={{ paddingTop: 'calc(56px + env(safe-area-inset-top))' }}>
 
-      {/* 右上角ASCII艺术背景（Q3/4/5/8 进一步下移；Q8 缩小） */}
+      {/* 右上角ASCII艺术背景（缩小尺寸并降低层级） */}
       <div 
-        className={`absolute right-0 pointer-events-none z-[-1] question-ascii-right ${
+        className={`absolute right-0 pointer-events-none z-0 question-ascii-right ${
           isVisible ? getImageAnimationClass('right', questionNumber) : 'opacity-0 translate-x-8'
         }`}
         style={{ 
@@ -416,39 +501,41 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
             [3,4,5].includes(questionNumber) ? '7.5rem' :
             '6rem'
           ),
-          width: questionNumber === 8 ? '26%' : '32%'
+          // use base width; enlargement handled via animation final scale in CSS
+          width: questionNumber === 8 ? '18%' : '22%'
         }}
       >
         <img 
-          src={(questionImages[questionNumber]?.right) || "/ascii-right.png"}
+          src={(questionImages[questionNumber]?.right) || ((import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}ascii-right.png` : '/ascii-right.png')}
           alt="ASCII Background" 
           className="w-full h-auto object-contain deco-yellow"
         />
       </div>
 
-      {/* 左下角黄色ASCII艺术装饰（整体下移并缩小） */}
+      {/* 左下角黄色ASCII艺术装饰（缩小尺寸并降低层级） */}
       <div 
-        className={`absolute bottom-40 left-0 pointer-events-none z-[-1] question-ascii-left ${
+        className={`absolute bottom-40 left-0 pointer-events-none z-0 question-ascii-left ${
           isVisible ? getImageAnimationClass('left', questionNumber) : 'opacity-0 translate-y-8'
         }`}
         style={{ 
           animationDelay: getAnimationDelay(1, 'image'),
-          width: '30%'
+          // use base width; enlargement handled via animation final scale in CSS
+          width: '18%'
         }}
       >
         <img 
-          src={(questionImages[questionNumber]?.left) || "/ascii-left.png"}
+          src={(questionImages[questionNumber]?.left) || ((import.meta as any).env?.BASE_URL ? `${(import.meta as any).env.BASE_URL}ascii-left.png` : '/ascii-left.png')}
           alt="ASCII Decoration" 
           className="w-full h-auto object-contain deco-black"
         />
       </div>
 
-      {/* 主内容区域 */}
-      <div className="relative z-20 transform-gpu px-6">
-        {/* 问题标题：所有题目统一使用打字机动画 */}
-        <div className="mt-16 mb-12">
+      {/* 主内容区域（专用顶层容器，确保永远在装饰图之上） */}
+      <div className="relative z-50 px-6 content-layer">
+        {/* 问题标题：所有题目统一使用打字机动画（整体上移） */}
+        <div className="mt-6 mb-12">
           {questionLines.line1 && (
-            <CssTypewriterLine
+            <TypeLineComponent
               text={questionLines.line1.text}
               className={`text-black font-rm`}
               style={{
@@ -463,7 +550,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
             />
           )}
           {questionLines.line2 && (
-            <CssTypewriterLine
+            <TypeLineComponent
               text={questionLines.line2.text}
               className={`text-black font-rm`}
               style={{ 
@@ -478,7 +565,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
             />
           )}
           {questionLines.line3 && (
-            <CssTypewriterLine
+            <TypeLineComponent
               text={questionLines.line3.text}
               className={`text-black font-rm`}
               style={{ 
@@ -493,7 +580,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
             />
           )}
           {questionLines.line4 && (
-            <CssTypewriterLine
+            <TypeLineComponent
               text={questionLines.line4.text}
               className={`text-black font-rm`}
               style={{ 
@@ -508,7 +595,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
             />
           )}
           {questionLines.line5 && (
-            <CssTypewriterLine
+            <TypeLineComponent
               text={questionLines.line5.text}
               className={`text-black font-rm`}
               style={{ 
@@ -589,7 +676,7 @@ export const QuestionPage: React.FC<QuestionPageProps> = ({
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`} 
       style={{ 
-        bottom: 'calc(40px + env(safe-area-inset-bottom))',
+        bottom: 'calc(20px + env(safe-area-inset-bottom))',
         animationDelay: '0.8s'
       }}>
         <p 

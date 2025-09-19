@@ -181,20 +181,7 @@ export const SwipePageContainer: React.FC<SwipePageContainerProps> = ({
           {child}
         </div>
       ))}
-      
-      {/* 页面指示器 */}
-      <div className="absolute bottom-8 right-6 z-10 flex flex-col space-y-2">
-        {children.map((_, index) => (
-          <div
-            key={index}
-            className={`w-1.5 rounded-full transition-all duration-300 ${
-              index === currentIndex 
-                ? 'bg-white opacity-100 h-6' 
-                : 'bg-white opacity-40 h-3'
-            }`}
-          />
-        ))}
-      </div>
+      {/* 页面指示器已移除（不再显示定位条） */}
     </div>
   );
 };

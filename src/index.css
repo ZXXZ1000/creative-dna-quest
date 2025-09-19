@@ -271,6 +271,11 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* Ensure letterbox/outside the 9:18 canvas is always pure white */
+  body {
+    background-color: #ffffff;
+  }
 }
 
 @layer base {
@@ -317,6 +322,23 @@
   .responsive-container {
     --responsive-scale: 1;
   }
+
+  /* Ensure question content stays above decorative layers across iOS compositing */
+  .content-layer { position: relative; z-index: 50; }
+  .question-ascii-left, .question-ascii-right { z-index: 0; }
+
+  /* iOS Safari compositing guard: promote content layer to its own layer */
+  @supports (-webkit-touch-callout: none) {
+    .content-layer { transform: translateZ(0); will-change: transform; z-index: 9999; }
+    /* 允许装饰图在 iOS 上继续动画；此前禁用动画导致静态显示 */
+    /* 不在此处覆盖 animation/transform，避免动画被禁用 */
+    .question-ascii-left img, .question-ascii-right img { transform: none !important; will-change: auto; }
+    /* Remove wrapper translate on iOS to avoid stacking glitches */
+    .qpage-wrapper { transform: none !important; will-change: opacity; }
+  }
+
+  /* Contain paint of decorative layers to their own stacking context */
+  .question-ascii-left, .question-ascii-right { contain: paint; }
 
   /* 按纵横比做轻微缩放补偿，避免出现大面积留白或元素过密 */
   .responsive-container[data-ar-band="tall"] {
@@ -373,16 +395,16 @@
   }
 
   .responsive-container[data-ar-band="wide"] .question-ascii-right {
-    width: 32% !important;
+    width: 22% !important;
   }
   .responsive-container[data-ar-band="tall"] .question-ascii-right {
-    width: 45% !important;
-  }
-  .responsive-container[data-ar-band="wide"] .question-ascii-left {
     width: 28% !important;
   }
+  .responsive-container[data-ar-band="wide"] .question-ascii-left {
+    width: 18% !important;
+  }
   .responsive-container[data-ar-band="tall"] .question-ascii-left {
-    width: 40% !important;
+    width: 22% !important;
   }
 
   /* 响应式间距类 */
@@ -659,11 +681,11 @@
   @keyframes button-slide-up {
     0% { 
       opacity: 0;
-      transform: translateX(-50%) translateY(30px) skewX(-12deg);
+      transform: translateX(-50%) translateY(30px);
     }
     100% { 
       opacity: 1;
-      transform: translateX(-50%) translateY(0) skewX(-12deg);
+      transform: translateX(-50%) translateY(0);
     }
   }
   
@@ -779,10 +801,9 @@
 
   /* Landing start button: 响应式缩放避免横屏过大 */
   .landing-start .landing-start-btn {
-    font-size: clamp(16px, calc(18px * var(--responsive-scale)), 20px);
-    padding: clamp(10px, calc(12px * var(--responsive-scale)), 16px)
-             clamp(28px, calc(36px * var(--responsive-scale)), 44px);
-    transform: scale(calc(1.5 * var(--responsive-scale)));
+    transform: none;
+    width: clamp(130px, calc(150px * var(--responsive-scale)), 200px);
+    height: auto;
   }
 
   .page-transition-enter {
@@ -1336,13 +1357,32 @@
   /* Pure CSS typewriter using ch width steps */
   @keyframes css-typing {
     from { width: 0ch; }
-    to { width: var(--tw-chars, 0); }
+    /* Larger right-side safety to avoid clipping last glyph across engines */
+    to { width: calc(var(--tw-chars, 0) + 1ch); }
   }
   .css-typewriter {
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
+    position: relative;
     width: 0ch; /* start width for animation */
+    /* Safety space for glyph overhangs; cancel visual shift via negative margin */
+    padding-right: 0.5ch;
+    padding-left: 0.4ch;
+    margin-left: -0.4ch;
+    will-change: width;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Left-edge occluder to hide any sub-pixel reveal at line start */
+  .css-typewriter::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0; bottom: 0;
+    width: 0.6ch;
+    background: #ffffff;
+    pointer-events: none;
   }
 
   /* 动画主题8: 流体流动 - 问题8 */
@@ -1516,12 +1556,10 @@
     0% { 
       opacity: 0;
       transform: translateX(-8px) scale(0.95);
-      filter: blur(1px);
     }
     100% { 
       opacity: 1;
       transform: translateX(0) scale(1);
-      filter: blur(0px);
     }
   }
 
@@ -1535,12 +1573,10 @@
     0% { 
       opacity: 0;
       transform: translateY(15px) scaleX(0.8) scaleY(1.2); 
-      filter: blur(1px);
     }
     100% { 
       opacity: 1;
       transform: translateY(0) scaleX(1) scaleY(1); 
-      filter: blur(0px);
     }
   }
 
@@ -1567,7 +1603,7 @@
     }
     100% { 
       opacity: 0.75;
-      transform: translateX(0) scale(1.5) rotate(0deg); 
+      transform: translateX(0) scale(1.95) rotate(0deg); 
     }
   }
 
@@ -1591,7 +1627,7 @@
     }
     100% { 
       opacity: 0.8;
-      transform: translateX(0) translateY(0) scale(1.5) rotate(0deg); 
+      transform: translateX(0) translateY(0) scale(1.95) rotate(0deg); 
     }
   }
 
@@ -1615,7 +1651,7 @@
     }
     100% { 
       opacity: 0.75;
-      transform: rotate(0deg) scale(1.5); 
+      transform: rotate(0deg) scale(1.95); 
     }
   }
 
@@ -1639,7 +1675,7 @@
     }
     100% { 
       opacity: 0.75;
-      transform: scale(1.5); 
+      transform: scale(1.95); 
     }
   }
 
