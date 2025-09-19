@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { SimplePageContainer } from '../SimplePageContainer';
 import { Logo } from '../../components/Logo';
 import { countries } from '../../data/countries';
-import { flagEmojiForName } from '../../lib/flagEmoji';
 import { CountrySelect } from '../CountrySelect';
 
 interface InfoPageProps {
@@ -17,14 +16,13 @@ interface InfoPageProps {
 
 export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) => {
   const [name, setName] = useState(initialData?.name || '');
-  const [email, setEmail] = useState(initialData?.email || '');
   const [region, setRegion] = useState(initialData?.region || '');
-  const [emailSubscription, setEmailSubscription] = useState(initialData?.emailSubscription ?? true);
-  const [errors, setErrors] = useState<{ name?: string; email?: string; region?: string }>({});
-  // Email is optional; no prompt modal is shown when omitted
+  const emailSubscription = initialData?.emailSubscription ?? true;
+  const [errors, setErrors] = useState<{ name?: string; region?: string }>({});
+  const persistedEmail = initialData?.email?.trim() ?? '';
 
   const validate = () => {
-    const newErrors: { name?: string; email?: string; region?: string } = {};
+    const newErrors: { name?: string; region?: string } = {};
     
     if (!name.trim()) {
       newErrors.name = 'Name is required';
@@ -34,10 +32,6 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
       newErrors.name = 'Name must be at most 20 characters';
     }
 
-    if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
     if (!region) {
       newErrors.region = 'Please select your region';
     }
@@ -49,7 +43,7 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
   const handleSubmit = () => {
     if (!validate()) return;
     
-    onContinue(name.trim(), email.trim(), region, emailSubscription);
+    onContinue(name.trim(), persistedEmail, region, emailSubscription);
   };
   
 
@@ -100,28 +94,6 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             )}
           </div>
 
-          {/* Email Input */}
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-800">Email Address (Optional)</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className={`w-full px-4 py-3 rounded-xl border-2 bg-white transition-all text-black
-                ${errors.email 
-                  ? 'border-red-400 focus:border-red-500' 
-                  : 'border-gray-200 focus:border-yellow-400'
-                } focus:outline-none`}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-            )}
-            <p className="text-xs text-gray-800 mt-1">
-              We'll send you your results and creative tips
-            </p>
-          </div>
-
           {/* Region Select (custom dropdown with fixed height and A–Z index) */}
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-800">Country/Region</label>
@@ -135,8 +107,6 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
               <p className="text-red-500 text-sm mt-1">{errors.region}</p>
             )}
           </div>
-
-          {/* Email Subscription removed per requirement */}
         </div>
 
         {/* Continue Button */}
@@ -149,8 +119,6 @@ export const InfoPage: React.FC<InfoPageProps> = ({ onContinue, initialData }) =
             GET MY RESULTS
           </button>
         </div>
-
-        {/* Email prompt removed */}
       </div>
     </SimplePageContainer>
   );

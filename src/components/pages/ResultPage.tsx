@@ -23,6 +23,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
 }) => {
   // 为图片添加版本参数，强制 iOS Safari 刷新最新资源（避免顽固缓存）
   const IMG_VERSION = 'v20250911';
+  const EXPLORE_URL = 'https://hototools.com/?utm_source=creative_gene&utm_medium=Social&utm_campaign=6th_hotoday';
   const regionEmoji = userRegion ? flagEmojiForName(userRegion) : '';
   const exportRef = useRef<HTMLDivElement>(null);
   const actionRef = useRef<HTMLDivElement>(null);
@@ -301,6 +302,25 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     }
   };
 
+  const baseActionButtonStyle: React.CSSProperties = {
+    fontFamily: 'RM Neue, sans-serif',
+    fontSize: '12px',
+    borderRadius: '999px',
+    padding: '5px 12px',
+    fontWeight: 600,
+    transition: 'transform 0.2s ease, filter 0.2s ease',
+    display: 'inline-flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    letterSpacing: '0.5px',
+    whiteSpace: 'nowrap',
+    minHeight: '28px',
+    border: '1px solid #1F1F1F',
+    minWidth: '92px',
+    textAlign: 'center',
+    lineHeight: 1
+  };
+
   return (
     <div className="h-full w-full relative bg-white">
       {/* Loading State */}
@@ -435,36 +455,64 @@ export const ResultPage: React.FC<ResultPageProps> = ({
       {imageLoaded && (
         <div
           ref={actionRef}
-          className="absolute left-0 right-0 flex justify-between px-6 z-15"
+          className="absolute left-0 right-0 px-4 z-15"
           style={{
-            bottom: 'calc(12px + env(safe-area-inset-bottom))', // 缩小底部留白，兼容安全区
-            paddingRight: 'calc(56px + env(safe-area-inset-right))' // 预留右侧空间给音乐按钮，避免重叠
+            bottom: 'calc(24px + env(safe-area-inset-bottom))', // 上移按钮组，兼容安全区
+            paddingRight: 'calc(56px + env(safe-area-inset-right) + 8px)', // 预留右侧空间给音乐按钮，避免重叠
+            display: 'flex',
+            flexWrap: 'nowrap',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
         >
-        <button
-          onClick={onRestart}
-          className="px-6 py-2 bg-black text-white font-medium hover:bg-gray-800 transition-colors"
-          style={{
-            fontFamily: 'RM Neue, sans-serif',
-            fontSize: '14px',
-            borderRadius: '50px',
-            minWidth: '100px'
-          }}
-        >
-          RESTART
-        </button>
-        <button
-          onClick={handleSaveResult}
-          className="px-6 py-1 bg-gray-200 text-black font-medium hover:bg-gray-300 transition-colors"
-          style={{
-            fontFamily: 'RM Neue, sans-serif',
-            fontSize: '14px',
-            borderRadius: '50px',
-            minWidth: '100px'
-          }}
-        >
-          SAVE RESULT
-        </button>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'nowrap',
+              gap: '8px',
+              maxWidth: '304px',
+              width: '100%',
+              justifyContent: 'center'
+            }}
+          >
+            <button
+              onClick={onRestart}
+              style={{
+                ...baseActionButtonStyle,
+                backgroundColor: '#FFFFFF',
+                color: '#1F1F1F'
+              }}
+              className="hover:brightness-95 active:scale-95"
+            >
+              RESTART
+            </button>
+            <button
+              onClick={handleSaveResult}
+              style={{
+                ...baseActionButtonStyle,
+                backgroundColor: '#C3C3C3',
+                color: '#1F1F1F'
+              }}
+              className="hover:brightness-95 active:scale-95"
+            >
+              SAVE RESULT
+            </button>
+            <a
+              href={EXPLORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                ...baseActionButtonStyle,
+                backgroundColor: '#FFED00',
+                color: '#1F1F1F',
+                minWidth: '108px',
+                padding: '6px 16px'
+              }}
+              className="hover:brightness-95 active:scale-95"
+            >
+              Explore HOTO
+            </a>
+          </div>
         </div>
       )}
     </div>

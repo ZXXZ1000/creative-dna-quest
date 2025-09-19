@@ -12,7 +12,7 @@ export function codeToFlagEmoji(code: string): string {
 // Name -> ISO alpha-2 code
 export const NAME_TO_CODE: Record<string, string> = {
   // Special domestic standard
-  'Mainland China': 'CN',
+  'China (Mainland)': 'CN',
   'Hong Kong, China': 'HK',
   'Macao, China': 'MO',
   'Taiwan, China': 'CN',
@@ -45,4 +45,3 @@ export function flagEmojiForName(name?: string): string {
   if (/china/i.test(key)) return codeToFlagEmoji('CN');
   return '🌍';
 }
-

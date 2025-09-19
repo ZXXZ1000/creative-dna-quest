@@ -39,7 +39,7 @@ export const countries: string[] = [
   'Central African Republic',
   'Chad',
   'Chile',
-  'Mainland China',
+  'China (Mainland)',
   'Colombia',
   'Comoros',
   'Congo (Congo-Brazzaville)',
