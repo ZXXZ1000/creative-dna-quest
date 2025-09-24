@@ -2,7 +2,7 @@ import { assetUrl } from './assetUrl'
 
 let typingAudio: HTMLAudioElement | null = null
 let primed = false
-let primeInProgress = false
+let primingPromise: Promise<void> | null = null
 
 export function getTypingSfx(): HTMLAudioElement {
   if (!typingAudio) {
@@ -17,23 +17,44 @@ export function getTypingSfx(): HTMLAudioElement {
 
 // 在用户手势回调内调用，提前解锁 iOS 播放限制
 export async function primeTypingSfx(): Promise<void> {
-  if (primed || primeInProgress) return
-  primeInProgress = true
-  try {
-    const a = getTypingSfx()
+  if (primed) return
+  if (primingPromise) return primingPromise
+
+  const audio = getTypingSfx()
+  const previousVolume = audio.volume
+
+  const waitNextFrame = () =>
+    new Promise<void>((resolve) => {
+      if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(() => resolve())
+      } else {
+        setTimeout(() => resolve(), 0)
+      }
+    })
+
+  primingPromise = (async () => {
+    audio.volume = 0
+
     try {
-      // 静音预热：在用户手势内无声播放后立即暂停，避免首页出现敲击音
-      const prevVol = a.volume
-      a.volume = 0
-      await a.play()
-      a.pause()
-      try { a.currentTime = 0 } catch {}
-      a.volume = prevVol
+      await audio.play()
+      await waitNextFrame()
+
+      const shouldSilentlyStop = audio.volume === 0
+
+      if (shouldSilentlyStop) {
+        try { audio.pause() } catch {}
+        try { audio.currentTime = 0 } catch {}
+        audio.volume = previousVolume
+      }
+
       primed = true
     } catch {
-      // 如果仍然失败，保留未 primed 状态，等待下一次手势再尝试
+      audio.volume = previousVolume
+      // 播放仍未解锁，等待下一次手势再尝试
+    } finally {
+      primingPromise = null
     }
-  } finally {
-    primeInProgress = false
-  }
+  })()
+
+  return primingPromise
 }

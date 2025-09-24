@@ -7,6 +7,7 @@ export type AnalyticsEventName =
   | 'info_submitted'
   | 'result_computed'
   | 'save_result_success'
+  | 'explore_hoto_clicked'
 
 // Simple UUID v4 (RFC4122 variant)
 const uuid = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -17,7 +18,17 @@ const STORAGE_KEYS = {
   sid: 'cdna.sid',
   openedFlagPrefix: 'cdna.opened.',
   queue: 'cdna.queue',
+  utmFirstTouch: 'cdna.utm.first',
 } as const
+
+const UTM_KEY_MAP: Record<string, string[]> = {
+  utm_source: ['utm_source', 'source', 'src', 'channel'],
+  utm_medium: ['utm_medium', 'medium', 'med'],
+  utm_campaign: ['utm_campaign', 'campaign', 'camp'],
+  utm_content: ['utm_content', 'content', 'cnt', 'creative'],
+  utm_term: ['utm_term', 'term', 'keyword', 'kw'],
+  lid: ['lid', 'link', 'link_id', 'ref', 'ref_id', 'qr', 'qr_id'],
+};
 
 export interface TrackContext {
   session_id: string
@@ -44,16 +55,99 @@ function getOrCreateSessionId(): string {
   return sid
 }
 
-function readUtm(): Record<string, string | null> {
-  const p = new URLSearchParams(window.location.search)
-  return {
-    utm_source: p.get('utm_source'),
-    utm_medium: p.get('utm_medium'),
-    utm_campaign: p.get('utm_campaign'),
-    utm_content: p.get('utm_content'),
-    utm_term: p.get('utm_term'),
-    lid: p.get('lid') || p.get('link') || p.get('ref'),
+function normalizeValue(value: string | null | undefined): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed.length ? trimmed : null
+}
+
+function extractMappedParams(search: URLSearchParams): Record<string, string | null> {
+  const result: Record<string, string | null> = {
+    utm_source: null,
+    utm_medium: null,
+    utm_campaign: null,
+    utm_content: null,
+    utm_term: null,
+    lid: null,
   }
+
+  Object.entries(UTM_KEY_MAP).forEach(([key, aliases]) => {
+    for (const alias of aliases) {
+      const value = normalizeValue(search.get(alias))
+      if (value) {
+        result[key] = value
+        break
+      }
+    }
+  })
+
+  return result
+}
+
+function parseReferrerUtm(): Record<string, string | null> {
+  const ref = document.referrer
+  if (!ref) {
+    return { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null, utm_term: null, lid: null }
+  }
+  try {
+    const url = new URL(ref)
+    return extractMappedParams(url.searchParams)
+  } catch {
+    return { utm_source: null, utm_medium: null, utm_campaign: null, utm_content: null, utm_term: null, lid: null }
+  }
+}
+
+function hasAnyValue(obj: Record<string, string | null>): boolean {
+  return Object.values(obj).some((value) => Boolean(value))
+}
+
+function readStoredUtm(): Record<string, string | null> | null {
+  try {
+    const raw = storage.getItem(STORAGE_KEYS.utmFirstTouch)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed || typeof parsed !== 'object') return null
+    return {
+      utm_source: normalizeValue(parsed.utm_source),
+      utm_medium: normalizeValue(parsed.utm_medium),
+      utm_campaign: normalizeValue(parsed.utm_campaign),
+      utm_content: normalizeValue(parsed.utm_content),
+      utm_term: normalizeValue(parsed.utm_term),
+      lid: normalizeValue(parsed.lid),
+    }
+  } catch {
+    return null
+  }
+}
+
+function persistFirstTouchUtm(utm: Record<string, string | null>) {
+  try {
+    if (!hasAnyValue(utm)) return
+    const existing = readStoredUtm()
+    if (existing && hasAnyValue(existing)) return
+    storage.setItem(STORAGE_KEYS.utmFirstTouch, JSON.stringify(utm))
+  } catch {}
+}
+
+function readUtm(): Record<string, string | null> {
+  const current = extractMappedParams(new URLSearchParams(window.location.search))
+  const stored = readStoredUtm()
+  const referrer = parseReferrerUtm()
+
+  const merged: Record<string, string | null> = {
+    utm_source: current.utm_source || stored?.utm_source || referrer.utm_source,
+    utm_medium: current.utm_medium || stored?.utm_medium || referrer.utm_medium,
+    utm_campaign: current.utm_campaign || stored?.utm_campaign || referrer.utm_campaign,
+    utm_content: current.utm_content || stored?.utm_content || referrer.utm_content,
+    utm_term: current.utm_term || stored?.utm_term || referrer.utm_term,
+    lid: current.lid || stored?.lid || referrer.lid,
+  }
+
+  if (!stored && hasAnyValue(merged)) {
+    persistFirstTouchUtm(merged)
+  }
+
+  return merged
 }
 
 function buildContext(): TrackContext {
@@ -136,4 +230,3 @@ export function trackLinkOpenedOnce() {
   storage.setItem(key, '1')
   void track({ name: 'link_opened', props: { link_id: linkId } })
 }
-

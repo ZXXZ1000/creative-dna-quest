@@ -78,7 +78,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   // 动态计算图片尺寸和容器高度
   useEffect(() => {
     const TOP_MARGIN = 12; // 顶部留白（缩小）
-    const GAP_BETWEEN = 16; // 滚动窗口与按钮区之间的可视空隙
+    const GAP_BETWEEN = 24; // 滚动窗口与按钮区之间的可视空隙（减半）
 
     const loadImageAndCalculateDimensions = () => {
       const img = new Image();
@@ -147,7 +147,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     // 监听窗口大小变化
     const handleResize = () => {
       const TOP_MARGIN = 12;
-      const GAP_BETWEEN = 16;
+      const GAP_BETWEEN = 24;
       if (imageDimensions.width && imageDimensions.height) {
         const windowWidth = canvasWidth || window.innerWidth;
         const imageAspectRatio = imageDimensions.height / imageDimensions.width;
@@ -303,7 +303,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
   };
 
   const baseActionButtonStyle: React.CSSProperties = {
-    fontFamily: 'RM Neue, sans-serif',
+    fontFamily: '"RM Neue", ui-sans-serif, system-ui, sans-serif',
     fontSize: '12px',
     borderRadius: '999px',
     padding: '5px 12px',
@@ -315,7 +315,7 @@ export const ResultPage: React.FC<ResultPageProps> = ({
     letterSpacing: '0.5px',
     whiteSpace: 'nowrap',
     minHeight: '28px',
-    border: '1px solid #1F1F1F',
+    border: '0.75px solid #1F1F1F',
     minWidth: '92px',
     textAlign: 'center',
     lineHeight: 1
@@ -448,6 +448,13 @@ export const ResultPage: React.FC<ResultPageProps> = ({
           .scrollable-container > div::-webkit-scrollbar {
             display: none;
           }
+          /* Bottom actions: align with scroll window left (0) and page right (0) */
+          .result-actions { padding-left: 0; padding-right: 0; }
+          .btn-row { --btn-gap: 8px; }
+          /* On narrow screens, reduce side padding and gap so three buttons fit one line */
+          @media (max-width: 380px) {
+            .btn-row { --btn-gap: 4px; }
+          }
         `
       }} />
 
@@ -455,10 +462,9 @@ export const ResultPage: React.FC<ResultPageProps> = ({
       {imageLoaded && (
         <div
           ref={actionRef}
-          className="absolute left-0 right-0 px-4 z-15"
+          className="absolute left-0 right-0 z-15 result-actions"
           style={{
-            bottom: 'calc(24px + env(safe-area-inset-bottom))', // 上移按钮组，兼容安全区
-            paddingRight: 'calc(56px + env(safe-area-inset-right) + 8px)', // 预留右侧空间给音乐按钮，避免重叠
+            bottom: 'calc(12px + env(safe-area-inset-bottom))', // 按钮整体向下，保留安全区
             display: 'flex',
             flexWrap: 'nowrap',
             justifyContent: 'center',
@@ -466,13 +472,15 @@ export const ResultPage: React.FC<ResultPageProps> = ({
           }}
         >
           <div
+            className="btn-row"
             style={{
               display: 'flex',
               flexWrap: 'nowrap',
-              gap: '8px',
-              maxWidth: '304px',
+              gap: 'var(--btn-gap, 8px)',
               width: '100%',
-              justifyContent: 'center'
+              maxWidth: '100%',
+              justifyContent: 'space-between',
+              alignItems: 'center'
             }}
           >
             <button
@@ -501,6 +509,11 @@ export const ResultPage: React.FC<ResultPageProps> = ({
               href={EXPLORE_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                try {
+                  track({ name: 'explore_hoto_clicked', props: { result_type: result?.type, dest: EXPLORE_URL } })
+                } catch {}
+              }}
               style={{
                 ...baseActionButtonStyle,
                 backgroundColor: '#FFED00',

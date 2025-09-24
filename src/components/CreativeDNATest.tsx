@@ -164,7 +164,7 @@ export const CreativeDNATest: React.FC = () => {
 
   return (
     <div className="h-full overflow-hidden relative">
-      <AudioController />
+      {state.currentPage !== 11 && <AudioController />}
       {isQuestionPage && (
         <div
           className="absolute top-0 left-0 right-0 z-50"

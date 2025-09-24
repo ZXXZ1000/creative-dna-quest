@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Logo } from '../../components/Logo';
 // Typing SFX removed per request
 import { primeTypingSfx } from '../../lib/typingSfx';
@@ -10,6 +10,42 @@ interface LandingPageProps {
 export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
   const [agreementChecked, setAgreementChecked] = useState(true); // Default checked per spec
   const [showScienceModal, setShowScienceModal] = useState(false);
+  const [scienceModalClosing, setScienceModalClosing] = useState(false);
+  const closeTimeoutRef = useRef<number | null>(null);
+  const SCIENCE_MODAL_ANIM_MS = 520;
+
+  useEffect(() => () => {
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  }, []);
+
+  const openScienceModal = () => {
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setScienceModalClosing(false);
+    setShowScienceModal(true);
+  };
+
+  const closeScienceModal = (after?: () => void) => {
+    if (!showScienceModal) {
+      if (after) after();
+      return;
+    }
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+    }
+    setScienceModalClosing(true);
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setShowScienceModal(false);
+      setScienceModalClosing(false);
+      closeTimeoutRef.current = null;
+      if (after) after();
+    }, SCIENCE_MODAL_ANIM_MS);
+  };
 
   return (
     <div className="h-full w-full relative overflow-hidden" style={{ 
@@ -217,7 +253,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         }}>
           {/* Science Behind Link */}
           <button 
-            onClick={() => setShowScienceModal(true)}
+            onClick={openScienceModal}
             className="text-gray-400 r-text-sm underline hover:text-gray-600 transition-colors font-inter"
           >
             THE SCIENCE BEHIND
@@ -272,14 +308,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       
       {/* Science Behind Modal */}
       {showScienceModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50" style={{
-          padding: 'clamp(1rem, 5vw, 2rem)'
-        }}>
-            <div className="bg-white w-full animate-scale-in shadow-2xl relative" style={{ 
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 transition-opacity duration-500 ${scienceModalClosing ? 'opacity-0' : 'opacity-100'}`}
+          style={{ padding: 'clamp(1rem, 5vw, 2rem)' }}
+          onClick={() => closeScienceModal()}
+        >
+          <div
+            className={`bg-white w-full shadow-2xl relative ${scienceModalClosing ? 'modal-animate-out' : 'modal-animate-in'}`}
+            style={{ 
               maxWidth: 'clamp(320px, 85vw, 480px)', 
               height: 'clamp(550px, 85vh, 650px)',
               width: '100%'
-            }}>
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
             {/* Modal Header - White background with folder tab */}
             <div className="bg-white relative" style={{
               paddingLeft: 'clamp(1rem, 4vw, 2rem)',
@@ -369,10 +411,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             }}>
               <button 
                 onClick={() => {
-                  setShowScienceModal(false);
-                  if (agreementChecked) {
-                    onStart();
-                  }
+                  closeScienceModal(() => {
+                    if (agreementChecked) {
+                      onStart();
+                    }
+                  });
                 }}
                 className="bg-white text-gray-800 font-medium hover:bg-gray-100 transition-colors flex items-center justify-center r-text-base"
                 style={{ 
